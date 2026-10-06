@@ -1,6 +1,9 @@
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
+    return {
+      statusCode: 405,
+      body: "Method Not Allowed"
+    };
   }
 
   try {
@@ -8,22 +11,38 @@ exports.handler = async (event) => {
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
     if (!token || !chatId) {
-      return { statusCode: 500, body: "Telegram settings missing" };
+      console.error("Missing Telegram environment variables");
+
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          ok: false,
+          error: "Telegram settings missing"
+        })
+      };
     }
 
     const order = JSON.parse(event.body || "{}");
 
     const clean = (value) =>
-      String(value ?? "").replace(/[<>]/g, "").slice(0, 500);
+      String(value ?? "")
+        .replace(/[<>]/g, "")
+        .slice(0, 500);
 
-    const products = Array.isArray(order.items) ? order.items : [];
+    const products = Array.isArray(order.items)
+      ? order.items
+      : [];
 
     const productText = products
       .slice(0, 30)
-      .map(
-        (item) =>
-          `• ${clean(item.name)} | Розмір: ${clean(item.size)} | ${Number(item.qty) || 1} шт. | ${Number(item.price) || 0} ₴`
-      )
+      .map((item) => {
+        return (
+          `• ${clean(item.name)}\n` +
+          `  Розмір: ${clean(item.size)} | ` +
+          `${Number(item.qty) || 1} шт. | ` +
+          `${Number(item.price) || 0} ₴`
+        );
+      })
       .join("\n");
 
     const text = [
@@ -34,7 +53,7 @@ exports.handler = async (event) => {
       `📞 ${clean(order.customer?.phone)}`,
       "",
       "📦 ТОВАРИ:",
-      productText,
+      productText || "Товари не вказані",
       "",
       `💰 Сума: ${Number(order.total) || 0} ₴`,
       `💳 Оплата: ${
@@ -45,39 +64,80 @@ exports.handler = async (event) => {
       "",
       "🚚 Nova Poshta",
       `🏙️ ${clean(order.customer?.city)}`,
-      `${order.customer?.delivery === "locker" ? "📮 Поштомат" : "🏤 Відділення"}: ${clean(order.customer?.warehouse)}`,
+      `${
+        order.customer?.delivery === "locker"
+          ? "📮 Поштомат"
+          : "🏤 Відділення"
+      }: ${clean(order.customer?.warehouse)}`,
       order.customer?.comment
         ? `💬 Коментар: ${clean(order.customer.comment)}`
-        : "",
+        : ""
     ]
       .filter(Boolean)
       .join("\n");
 
-    const response = await fetch(
+    const telegramResponse = await fetch(
       `https://api.telegram.org/bot${token}/sendMessage`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           chat_id: chatId,
-          text: text,
-        }),
+          text: text
+        })
       }
     );
 
-    if (!response.ok) {
-      throw new Error("Telegram error");
+    const telegramResult = await telegramResponse.json();
+
+    if (!telegramResponse.ok) {
+      console.error(
+        "TELEGRAM API ERROR:",
+        telegramResponse.status,
+        telegramResult
+      );
+
+      return {
+        statusCode: 502,
+        body: JSON.stringify({
+          ok: false,
+          error: "Telegram rejected request"
+        })
+      };
     }
+
+    console.log(
+      "REVORA order sent successfully:",
+      clean(order.number)
+    );
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ ok: true }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ok: true
+      })
     };
+
   } catch (error) {
-    console.error("NEW ORDER ERROR:", error);
+    console.error(
+      "NEW ORDER ERROR:",
+      error?.message || error
+    );
+
     return {
       statusCode: 500,
-      body: JSON.stringify({ ok: false }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ok: false,
+        error: "Internal server error"
+      })
     };
   }
 };
