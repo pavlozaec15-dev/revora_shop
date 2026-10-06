@@ -74,6 +74,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ ok: true }),
     };
   } catch (error) {
+    console.error("NEW ORDER ERROR:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ ok: false }),
