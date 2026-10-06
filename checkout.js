@@ -181,4 +181,4 @@ document.querySelector("#checkoutForm").onsubmit = async e => {
   }
 };
 
-renderCheckout();
+renderCheckout(); 
