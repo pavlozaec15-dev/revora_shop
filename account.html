@@ -1,10 +1,14 @@
-<!doctype html><html lang="uk"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><title>Особистий кабінет — REVORA</title><link rel="stylesheet" href="style.css"></head><body>
-<div class="topbar">БЕЗКОШТОВНА ДОСТАВКА NOVA POSHTA ВІД 8 000 ₴</div><header><a class="logo" href="index.html">REVORA</a><nav><a href="catalog.html">КАТАЛОГ</a><a href="catalog.html?sort=new">НОВИНКИ</a><a href="catalog.html?sale=1">SALE</a></nav><div class="tools"><button id="cart">BAG <span id="count">0</span></button></div></header>
+<!doctype html><html lang="uk"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><title>REVORA Account</title><link rel="stylesheet" href="style.css?v=account-final-1"></head><body>
+<div class="topbar">БЕЗКОШТОВНА ДОСТАВКА NOVA POSHTA ВІД 8 000 ₴</div>
+<header><a class="logo" href="index.html">REVORA</a><nav><a href="catalog.html">КАТАЛОГ</a><a href="catalog.html?sort=new">НОВИНКИ</a><a href="catalog.html?sale=1">SALE</a></nav></header>
 <main class="accountPage"><section class="accountHero"><small>REVORA ACCOUNT</small><h1>Особистий<br>кабінет</h1><p>Замовлення, бонуси, VIP-рівень та обране — в одному місці.</p></section>
-<section id="accountGuest" class="accountGuest"><div><small>WELCOME TO REVORA</small><h2>Увійти в кабінет</h2><p>Зараз це локальна демо-версія профілю. Справжню авторизацію та Google-вхід підключимо разом із базою даних.</p><form id="demoLogin" action="account-dashboard.html" method="get"><label>Ім’я<input id="accountName" name="name" required placeholder="Ваше ім’я"></label><label>Телефон<input id="accountPhone" name="phone" required type="tel" placeholder="+380 __ ___ __ __"></label><button type="submit">ПРОДОВЖИТИ</button></form></div></section>
-<section id="accountDashboard" class="accountDashboard" hidden><div class="accountHead"><div><small>MY REVORA</small><h2>Привіт, <span id="profileName"></span></h2></div><button id="logout">ВИЙТИ</button></div>
-<div class="accountStats"><article><small>БОНУСИ</small><strong id="bonusCount">0 ₴</strong><span>1 бонус = 1 ₴</span></article><article><small>СТАТУС</small><strong id="vipStatus">REVORA</strong><span id="vipText">До VIP — 20 000 ₴ покупок</span></article><article><small>ЗАМОВЛЕННЯ</small><strong id="orderCount">0</strong><span>Історія покупок</span></article></div>
-<div class="vipCard"><div><small>REVORA VIP</small><h3>Твій прогрес до VIP</h3><p>VIP відкриває 5% знижки, безкоштовну доставку та ранній доступ до новинок.</p></div><div><b id="vipProgressText">0 / 20 000 ₴</b><div class="vipBar"><i id="vipBar"></i></div></div></div>
-<div class="accountGrid"><section><div class="accountSectionTitle"><h3>Мої замовлення</h3><a href="catalog.html">КУПИТИ ЩЕ →</a></div><div id="accountOrders"></div></section><section><div class="accountSectionTitle"><h3>Обране</h3></div><div class="accountEmpty"><span>♡</span><p>Збережені товари з’являться тут.</p></div></section></div></section></main>
-
-</body></html>
+<section class="accountGuest" id="loginBox"><div><small>WELCOME TO REVORA</small><h2>Увійти в кабінет</h2><p>Введіть ім’я та номер телефону.</p>
+<div id="loginForm"><label>Ім’я<input id="accountName" autocomplete="name" placeholder="Ваше ім’я"></label><label>Телефон<input id="accountPhone" type="tel" autocomplete="tel" placeholder="+380 __ ___ __ __"></label><a id="continueBtn" href="account-dashboard.html" style="display:block;padding:16px;background:#111;color:#fff;text-decoration:none;text-align:center;margin-top:12px">ПРОДОВЖИТИ →</a></div>
+</div></section></main>
+<script>
+(function(){
+var b=document.getElementById('continueBtn'),n=document.getElementById('accountName'),p=document.getElementById('accountPhone');
+function sync(){var q=new URLSearchParams();if(n.value.trim())q.set('name',n.value.trim());if(p.value.trim())q.set('phone',p.value.trim());b.href='account-dashboard.html'+(q.toString()?'?'+q.toString():'');}
+n.addEventListener('input',sync);p.addEventListener('input',sync);b.addEventListener('click',sync);
+})();
+</script></body></html>
