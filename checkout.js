@@ -1,4 +1,5 @@
-const cMoney = n => Number(n || 0).toLocaleString("uk-UA") + " ₴";
+const cMoney = n =>
+  Number(n || 0).toLocaleString("uk-UA") + " ₴";
 
 let checkoutCart = JSON.parse(
   localStorage.getItem("revoraCartItems") || "[]"
@@ -10,13 +11,20 @@ const form = document.querySelector("#checkoutForm");
 
 let selectedCityRef = "";
 let cityTimer;
+let warehouseTimer;
 
-/* ---------- КОШИК ---------- */
+/* =========================
+   КОШИК
+========================= */
 
 function renderCheckout() {
   if (!checkoutCart.length) {
-    items.innerHTML =
-      '<div class="emptyCheckout"><p>Кошик порожній.</p><a href="catalog.html">ПЕРЕЙТИ В КАТАЛОГ</a></div>';
+    items.innerHTML = `
+      <div class="emptyCheckout">
+        <p>Кошик порожній.</p>
+        <a href="catalog.html">ПЕРЕЙТИ В КАТАЛОГ</a>
+      </div>
+    `;
 
     totals.innerHTML = "";
 
@@ -28,25 +36,49 @@ function renderCheckout() {
 
   items.innerHTML = checkoutCart.map(x => `
     <div class="checkoutItem">
-      <div class="miniPhoto">REVORA</div>
+
+      <div class="miniPhoto">
+        REVORA
+      </div>
 
       <div>
         <b>${x.name}</b>
-        <small>Розмір: ${x.size}</small>
+
+        <small>
+          Розмір: ${x.size}
+        </small>
 
         <div class="checkoutQty">
-          <button type="button" data-minus="${x.id}|${x.size}">−</button>
+
+          <button
+            type="button"
+            data-minus="${x.id}|${x.size}"
+          >
+            −
+          </button>
+
           <span>${x.qty}</span>
-          <button type="button" data-plus="${x.id}|${x.size}">+</button>
+
+          <button
+            type="button"
+            data-plus="${x.id}|${x.size}"
+          >
+            +
+          </button>
+
         </div>
       </div>
 
-      <strong>${cMoney(x.price * x.qty)}</strong>
+      <strong>
+        ${cMoney(x.price * x.qty)}
+      </strong>
+
     </div>
   `).join("");
 
   const subtotal = checkoutCart.reduce(
-    (sum, x) => sum + Number(x.price) * Number(x.qty),
+    (sum, x) =>
+      sum + Number(x.price) * Number(x.qty),
     0
   );
 
@@ -58,14 +90,24 @@ function renderCheckout() {
 
     <div class="sumLine">
       <span>Доставка</span>
-      <b>${subtotal >= 8000 ? "Безкоштовно" : "За тарифами Nova Poshta"}</b>
+
+      <b>
+        ${
+          subtotal >= 8000
+            ? "Безкоштовно"
+            : "За тарифами Nova Poshta"
+        }
+      </b>
     </div>
 
     ${
       subtotal < 8000
-        ? `<p class="freeHint">
-            До безкоштовної доставки ще ${cMoney(8000 - subtotal)}
-           </p>`
+        ? `
+          <p class="freeHint">
+            До безкоштовної доставки ще
+            ${cMoney(8000 - subtotal)}
+          </p>
+        `
         : ""
     }
 
@@ -75,28 +117,38 @@ function renderCheckout() {
     </div>
   `;
 
-  items.querySelectorAll("[data-minus]").forEach(btn => {
-    btn.onclick = () => changeQty(btn.dataset.minus, -1);
-  });
+  items
+    .querySelectorAll("[data-minus]")
+    .forEach(btn => {
+      btn.onclick = () =>
+        changeQty(btn.dataset.minus, -1);
+    });
 
-  items.querySelectorAll("[data-plus]").forEach(btn => {
-    btn.onclick = () => changeQty(btn.dataset.plus, 1);
-  });
+  items
+    .querySelectorAll("[data-plus]")
+    .forEach(btn => {
+      btn.onclick = () =>
+        changeQty(btn.dataset.plus, 1);
+    });
 }
 
 function changeQty(key, delta) {
   const [id, size] = key.split("|");
 
   const product = checkoutCart.find(
-    x => x.id === id && x.size === size
+    x =>
+      String(x.id) === String(id) &&
+      String(x.size) === String(size)
   );
 
   if (!product) return;
 
-  product.qty += delta;
+  product.qty =
+    Number(product.qty || 1) + delta;
 
   if (product.qty <= 0) {
-    checkoutCart = checkoutCart.filter(x => x !== product);
+    checkoutCart =
+      checkoutCart.filter(x => x !== product);
   }
 
   localStorage.setItem(
@@ -107,48 +159,70 @@ function changeQty(key, delta) {
   renderCheckout();
 }
 
-/* ---------- NOVA POSHTA ---------- */
+/* =========================
+   NOVA POSHTA
+========================= */
 
-const cityInput = form.querySelector('[name="city"]');
-const warehouseInput = form.querySelector('[name="warehouse"]');
+const cityInput =
+  form.querySelector('[name="city"]');
+
+const warehouseInput =
+  form.querySelector('[name="warehouse"]');
 
 function createResultsBox(input, className) {
-  const box = document.createElement("div");
+  const box =
+    document.createElement("div");
+
   box.className = className;
   box.style.display = "none";
 
-  input.parentElement.style.position = "relative";
+  input.parentElement.style.position =
+    "relative";
+
   input.parentElement.appendChild(box);
 
   return box;
 }
 
-const cityResults = createResultsBox(
-  cityInput,
-  "npResults npCityResults"
-);
+const cityResults =
+  createResultsBox(
+    cityInput,
+    "npResults npCityResults"
+  );
 
-const warehouseResults = createResultsBox(
-  warehouseInput,
-  "npResults npWarehouseResults"
-);
+const warehouseResults =
+  createResultsBox(
+    warehouseInput,
+    "npResults npWarehouseResults"
+  );
 
 async function novaRequest(payload) {
   const response = await fetch(
-    "/.netlify/functions/nova-poshta",
+    "/api/nova-poshta",
     {
       method: "POST",
+
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type":
+          "application/json"
       },
+
       body: JSON.stringify(payload)
     }
   );
 
-  const result = await response.json();
+  const result =
+    await response.json();
 
   if (!response.ok || !result.ok) {
-    throw new Error("Nova Poshta request failed");
+    console.error(
+      "Nova Poshta error:",
+      result
+    );
+
+    throw new Error(
+      "Nova Poshta request failed"
+    );
   }
 
   return result.data;
@@ -159,293 +233,613 @@ function closeResults(box) {
   box.innerHTML = "";
 }
 
-cityInput.setAttribute("autocomplete", "off");
-warehouseInput.setAttribute("autocomplete", "off");
+cityInput.setAttribute(
+  "autocomplete",
+  "off"
+);
 
-cityInput.addEventListener("input", () => {
-  clearTimeout(cityTimer);
+warehouseInput.setAttribute(
+  "autocomplete",
+  "off"
+);
 
-  selectedCityRef = "";
-  warehouseInput.value = "";
-  closeResults(warehouseResults);
+/* ПОШУК МІСТА */
 
-  const search = cityInput.value.trim();
+cityInput.addEventListener(
+  "input",
+  () => {
 
-  if (search.length < 2) {
-    closeResults(cityResults);
-    return;
-  }
+    clearTimeout(cityTimer);
 
-  cityTimer = setTimeout(async () => {
-    try {
-      cityResults.innerHTML =
-        '<div class="npLoading">Шукаємо місто…</div>';
-      cityResults.style.display = "block";
+    selectedCityRef = "";
 
-      const data = await novaRequest({
-        action: "cities",
-        search
-      });
+    warehouseInput.value = "";
 
-      const addresses =
-        data?.[0]?.Addresses ||
-        data?.Addresses ||
-        [];
+    closeResults(
+      warehouseResults
+    );
 
-      if (!addresses.length) {
-        cityResults.innerHTML =
-          '<div class="npLoading">Нічого не знайдено</div>';
-        return;
-      }
+    const search =
+      cityInput.value.trim();
 
-      cityResults.innerHTML = addresses.map(city => {
-        const name =
-          city.Present ||
-          city.MainDescription ||
-          city.Description ||
-          "Населений пункт";
-
-        const ref =
-          city.DeliveryCity ||
-          city.Ref ||
-          city.SettlementRef ||
-          "";
-
-        return `
-          <button
-            type="button"
-            class="npOption"
-            data-city-ref="${ref}"
-            data-city-name="${String(name).replace(/"/g, "&quot;")}"
-          >
-            ${name}
-          </button>
-        `;
-      }).join("");
-
-      cityResults.querySelectorAll(".npOption").forEach(btn => {
-        btn.onclick = () => {
-          selectedCityRef = btn.dataset.cityRef;
-          cityInput.value = btn.dataset.cityName;
-
-          closeResults(cityResults);
-
-          warehouseInput.value = "";
-          warehouseInput.focus();
-        };
-      });
-
-    } catch (error) {
-      cityResults.innerHTML =
-        '<div class="npLoading">Помилка завантаження міст</div>';
-    }
-  }, 350);
-});
-
-async function loadWarehouses(search = "") {
-  if (!selectedCityRef) {
-    warehouseResults.innerHTML =
-      '<div class="npLoading">Спочатку виберіть місто зі списку</div>';
-
-    warehouseResults.style.display = "block";
-    return;
-  }
-
-  try {
-    warehouseResults.innerHTML =
-      '<div class="npLoading">Завантажуємо відділення…</div>';
-
-    warehouseResults.style.display = "block";
-
-    const data = await novaRequest({
-      action: "warehouses",
-      cityRef: selectedCityRef,
-      search
-    });
-
-    const deliveryType =
-      form.querySelector('[name="delivery"]:checked')?.value;
-
-    let warehouses = Array.isArray(data) ? data : [];
-
-    if (deliveryType === "locker") {
-      warehouses = warehouses.filter(x =>
-        String(x.Description || "")
-          .toLowerCase()
-          .includes("поштомат")
+    if (search.length < 2) {
+      closeResults(
+        cityResults
       );
-    } else {
-      warehouses = warehouses.filter(x =>
-        !String(x.Description || "")
-          .toLowerCase()
-          .includes("поштомат")
-      );
-    }
 
-    if (!warehouses.length) {
-      warehouseResults.innerHTML =
-        '<div class="npLoading">Нічого не знайдено</div>';
       return;
     }
 
-    warehouseResults.innerHTML = warehouses
-      .slice(0, 100)
-      .map(x => `
-        <button
-          type="button"
-          class="npOption warehouseOption"
-          data-warehouse="${String(x.Description || "").replace(/"/g, "&quot;")}"
-        >
-          ${x.Description || "Відділення"}
-        </button>
-      `)
-      .join("");
+    cityTimer = setTimeout(
+      async () => {
 
-    warehouseResults.querySelectorAll(".npOption").forEach(btn => {
-      btn.onclick = () => {
-        warehouseInput.value = btn.dataset.warehouse;
-        closeResults(warehouseResults);
-      };
-    });
+        try {
+          cityResults.innerHTML = `
+            <div class="npLoading">
+              Шукаємо місто…
+            </div>
+          `;
+
+          cityResults.style.display =
+            "block";
+
+          const data =
+            await novaRequest({
+              action: "cities",
+              search
+            });
+
+          let addresses = [];
+
+          if (Array.isArray(data)) {
+            data.forEach(group => {
+              if (
+                Array.isArray(
+                  group?.Addresses
+                )
+              ) {
+                addresses.push(
+                  ...group.Addresses
+                );
+              }
+            });
+          }
+
+          if (!addresses.length) {
+            cityResults.innerHTML = `
+              <div class="npLoading">
+                Нічого не знайдено
+              </div>
+            `;
+
+            return;
+          }
+
+          cityResults.innerHTML =
+            addresses.map(city => {
+
+              const name =
+                city.Present ||
+                city.MainDescription ||
+                city.Description ||
+                "Населений пункт";
+
+              const ref =
+                city.DeliveryCity ||
+                city.Ref ||
+                city.SettlementRef ||
+                "";
+
+              return `
+                <button
+                  type="button"
+                  class="npOption"
+                  data-city-ref="${ref}"
+                  data-city-name="${String(name)
+                    .replace(
+                      /"/g,
+                      "&quot;"
+                    )}"
+                >
+                  ${name}
+                </button>
+              `;
+            }).join("");
+
+          cityResults
+            .querySelectorAll(
+              ".npOption"
+            )
+            .forEach(btn => {
+
+              btn.onclick = () => {
+
+                selectedCityRef =
+                  btn.dataset.cityRef;
+
+                cityInput.value =
+                  btn.dataset.cityName;
+
+                closeResults(
+                  cityResults
+                );
+
+                warehouseInput.value =
+                  "";
+
+                warehouseInput.focus();
+              };
+            });
+
+        } catch (error) {
+
+          console.error(error);
+
+          cityResults.innerHTML = `
+            <div class="npLoading">
+              Помилка завантаження міст
+            </div>
+          `;
+        }
+
+      },
+      350
+    );
+  }
+);
+
+/* ВІДДІЛЕННЯ / ПОШТОМАТИ */
+
+async function loadWarehouses(
+  search = ""
+) {
+
+  if (!selectedCityRef) {
+
+    warehouseResults.innerHTML = `
+      <div class="npLoading">
+        Спочатку виберіть місто зі списку
+      </div>
+    `;
+
+    warehouseResults.style.display =
+      "block";
+
+    return;
+  }
+
+  try {
+
+    warehouseResults.innerHTML = `
+      <div class="npLoading">
+        Завантажуємо відділення…
+      </div>
+    `;
+
+    warehouseResults.style.display =
+      "block";
+
+    const data =
+      await novaRequest({
+        action: "warehouses",
+        cityRef: selectedCityRef,
+        search
+      });
+
+    const deliveryType =
+      form.querySelector(
+        '[name="delivery"]:checked'
+      )?.value;
+
+    let warehouses =
+      Array.isArray(data)
+        ? data
+        : [];
+
+    /* ПОШТОМАТ */
+
+    if (deliveryType === "locker") {
+
+      warehouses =
+        warehouses.filter(x => {
+
+          const description =
+            String(
+              x.Description || ""
+            ).toLowerCase();
+
+          const category =
+            String(
+              x.CategoryOfWarehouse ||
+              ""
+            ).toLowerCase();
+
+          return (
+            description.includes(
+              "поштомат"
+            ) ||
+            category.includes(
+              "поштомат"
+            )
+          );
+        });
+
+    }
+
+    /* ВІДДІЛЕННЯ */
+
+    else {
+
+      warehouses =
+        warehouses.filter(x => {
+
+          const description =
+            String(
+              x.Description || ""
+            ).toLowerCase();
+
+          const category =
+            String(
+              x.CategoryOfWarehouse ||
+              ""
+            ).toLowerCase();
+
+          return !(
+            description.includes(
+              "поштомат"
+            ) ||
+            category.includes(
+              "поштомат"
+            )
+          );
+        });
+
+    }
+
+    if (!warehouses.length) {
+
+      warehouseResults.innerHTML = `
+        <div class="npLoading">
+          Нічого не знайдено
+        </div>
+      `;
+
+      return;
+    }
+
+    warehouseResults.innerHTML =
+      warehouses
+        .slice(0, 100)
+        .map(x => {
+
+          const description =
+            x.Description ||
+            "Відділення";
+
+          return `
+            <button
+              type="button"
+              class="npOption warehouseOption"
+              data-warehouse="${String(
+                description
+              ).replace(
+                /"/g,
+                "&quot;"
+              )}"
+            >
+              ${description}
+            </button>
+          `;
+        })
+        .join("");
+
+    warehouseResults
+      .querySelectorAll(
+        ".npOption"
+      )
+      .forEach(btn => {
+
+        btn.onclick = () => {
+
+          warehouseInput.value =
+            btn.dataset.warehouse;
+
+          closeResults(
+            warehouseResults
+          );
+        };
+      });
 
   } catch (error) {
-    warehouseResults.innerHTML =
-      '<div class="npLoading">Помилка завантаження відділень</div>';
+
+    console.error(error);
+
+    warehouseResults.innerHTML = `
+      <div class="npLoading">
+        Помилка завантаження відділень
+      </div>
+    `;
   }
 }
 
-warehouseInput.addEventListener("focus", () => {
-  loadWarehouses(warehouseInput.value.trim());
-});
+/* ФОКУС НА ВІДДІЛЕННЯ */
 
-let warehouseTimer;
+warehouseInput.addEventListener(
+  "focus",
+  () => {
 
-warehouseInput.addEventListener("input", () => {
-  clearTimeout(warehouseTimer);
-
-  warehouseTimer = setTimeout(() => {
-    loadWarehouses(warehouseInput.value.trim());
-  }, 300);
-});
-
-form.querySelectorAll('[name="delivery"]').forEach(input => {
-  input.addEventListener("change", () => {
-    warehouseInput.value = "";
-    closeResults(warehouseResults);
-
-    if (selectedCityRef) {
-      loadWarehouses();
-    }
-  });
-});
-
-document.addEventListener("click", event => {
-  if (
-    !cityInput.contains(event.target) &&
-    !cityResults.contains(event.target)
-  ) {
-    closeResults(cityResults);
+    loadWarehouses(
+      warehouseInput.value.trim()
+    );
   }
+);
 
-  if (
-    !warehouseInput.contains(event.target) &&
-    !warehouseResults.contains(event.target)
-  ) {
-    closeResults(warehouseResults);
-  }
-});
+/* ПОШУК ВІДДІЛЕННЯ */
 
-/* ---------- ЗАМОВЛЕННЯ ---------- */
+warehouseInput.addEventListener(
+  "input",
+  () => {
 
-form.onsubmit = async event => {
-  event.preventDefault();
+    clearTimeout(
+      warehouseTimer
+    );
 
-  if (!checkoutCart.length) return;
+    warehouseTimer =
+      setTimeout(
+        () => {
 
-  if (!selectedCityRef) {
-    alert("Будь ласка, виберіть місто Nova Poshta зі списку.");
-    cityInput.focus();
-    return;
-  }
+          loadWarehouses(
+            warehouseInput.value.trim()
+          );
 
-  if (!warehouseInput.value.trim()) {
-    alert("Будь ласка, виберіть відділення або поштомат.");
-    warehouseInput.focus();
-    return;
-  }
-
-  const btn = document.querySelector(".placeOrder");
-
-  btn.disabled = true;
-  btn.textContent = "НАДСИЛАЄМО…";
-
-  const fd = new FormData(form);
-  const number = "RV" + String(Date.now()).slice(-6);
-
-  const order = {
-    number,
-    date: new Date().toISOString(),
-    customer: Object.fromEntries(fd),
-    items: checkoutCart,
-    total: checkoutCart.reduce(
-      (sum, x) => sum + Number(x.price) * Number(x.qty),
-      0
-    ),
-    status: "Прийнято"
-  };
-
-  try {
-    const response = await fetch(
-      "/.netlify/functions/new-order",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
         },
-        body: JSON.stringify(order)
+        300
+      );
+  }
+);
+
+/* ЗМІНА ТИПУ ДОСТАВКИ */
+
+form
+  .querySelectorAll(
+    '[name="delivery"]'
+  )
+  .forEach(input => {
+
+    input.addEventListener(
+      "change",
+      () => {
+
+        warehouseInput.value =
+          "";
+
+        closeResults(
+          warehouseResults
+        );
+
+        if (selectedCityRef) {
+          loadWarehouses();
+        }
       }
     );
+  });
 
-    if (!response.ok) {
-      throw new Error("Order send failed");
+/* ЗАКРИТТЯ СПИСКІВ */
+
+document.addEventListener(
+  "click",
+  event => {
+
+    if (
+      !cityInput.contains(
+        event.target
+      ) &&
+      !cityResults.contains(
+        event.target
+      )
+    ) {
+      closeResults(
+        cityResults
+      );
     }
 
-    const orders = JSON.parse(
-      localStorage.getItem("revoraOrders") || "[]"
-    );
-
-    orders.unshift(order);
-
-    localStorage.setItem(
-      "revoraOrders",
-      JSON.stringify(orders)
-    );
-
-    localStorage.removeItem("revoraCartItems");
-    checkoutCart = [];
-
-    document.querySelector("#successText").innerHTML = `
-      Номер вашого замовлення:
-      <b>#${number}</b><br>
-
-      Сума:
-      <b>${cMoney(order.total)}</b><br><br>
-
-      Замовлення успішно передано менеджеру REVORA.
-    `;
-
-    document
-      .querySelector("#orderSuccess")
-      .classList.add("show");
-
-  } catch (error) {
-    alert(
-      "Не вдалося надіслати замовлення. Спробуйте ще раз."
-    );
-
-    btn.disabled = false;
-    btn.textContent = "ПІДТВЕРДИТИ ЗАМОВЛЕННЯ";
+    if (
+      !warehouseInput.contains(
+        event.target
+      ) &&
+      !warehouseResults.contains(
+        event.target
+      )
+    ) {
+      closeResults(
+        warehouseResults
+      );
+    }
   }
-};
+);
+
+/* =========================
+   ЗАМОВЛЕННЯ
+========================= */
+
+form.onsubmit =
+  async event => {
+
+    event.preventDefault();
+
+    if (!checkoutCart.length) {
+      return;
+    }
+
+    if (!selectedCityRef) {
+
+      alert(
+        "Будь ласка, виберіть місто Nova Poshta зі списку."
+      );
+
+      cityInput.focus();
+
+      return;
+    }
+
+    if (
+      !warehouseInput.value.trim()
+    ) {
+
+      alert(
+        "Будь ласка, виберіть відділення або поштомат."
+      );
+
+      warehouseInput.focus();
+
+      return;
+    }
+
+    const btn =
+      document.querySelector(
+        ".placeOrder"
+      );
+
+    btn.disabled = true;
+
+    btn.textContent =
+      "НАДСИЛАЄМО…";
+
+    const fd =
+      new FormData(form);
+
+    const number =
+      "RV" +
+      String(Date.now())
+        .slice(-6);
+
+    const order = {
+
+      number,
+
+      date:
+        new Date()
+          .toISOString(),
+
+      customer:
+        Object.fromEntries(fd),
+
+      items:
+        checkoutCart,
+
+      total:
+        checkoutCart.reduce(
+          (sum, x) =>
+            sum +
+            Number(x.price) *
+            Number(x.qty),
+          0
+        ),
+
+      status:
+        "Прийнято"
+    };
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/new-order",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify(
+                order
+              )
+          }
+        );
+
+      const result =
+        await response.json();
+
+      if (
+        !response.ok ||
+        result.ok !== true
+      ) {
+        throw new Error(
+          "Order send failed"
+        );
+      }
+
+      const orders =
+        JSON.parse(
+          localStorage.getItem(
+            "revoraOrders"
+          ) || "[]"
+        );
+
+      orders.unshift(order);
+
+      localStorage.setItem(
+        "revoraOrders",
+        JSON.stringify(orders)
+      );
+
+      localStorage.removeItem(
+        "revoraCartItems"
+      );
+
+      checkoutCart = [];
+
+      const successText =
+        document.querySelector(
+          "#successText"
+        );
+
+      if (successText) {
+
+        successText.innerHTML = `
+          Номер вашого замовлення:
+          <b>#${number}</b>
+          <br>
+
+          Сума:
+          <b>
+            ${cMoney(order.total)}
+          </b>
+
+          <br><br>
+
+          Замовлення успішно
+          передано менеджеру REVORA.
+        `;
+      }
+
+      const success =
+        document.querySelector(
+          "#orderSuccess"
+        );
+
+      if (success) {
+        success.classList.add(
+          "show"
+        );
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Не вдалося надіслати замовлення. Спробуйте ще раз."
+      );
+
+      btn.disabled = false;
+
+      btn.textContent =
+        "ПІДТВЕРДИТИ ЗАМОВЛЕННЯ";
+    }
+  };
 
 renderCheckout();
