@@ -82,3 +82,44 @@
  .cartProductPhoto{height:80px}
  .drawer>h2{font-size:32px}
 }
+
+
+/* REVORA premium product page */
+.productDetails{max-width:590px}
+.sizeHead{display:flex;justify-content:space-between;align-items:center;margin-top:28px}
+.sizeHead #sizeGuide{border:0;background:none;text-decoration:underline;color:#706552;font-size:9px;letter-spacing:.08em;cursor:pointer}
+.qtyLabel{font-size:10px;letter-spacing:.12em;font-weight:700;margin:22px 0 10px}
+.productActions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.buyNow{width:100%;padding:17px;background:#c6a15b;color:#090909;border:1px solid #c6a15b;font-size:11px;font-weight:700;letter-spacing:.12em;cursor:pointer}
+.productBenefits{display:grid;gap:0}
+.productBenefits p{display:flex;justify-content:space-between;gap:20px;padding:13px 0;margin:0;border-bottom:1px solid #c9c1b4}
+.productBenefits b{color:#111;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.productBenefits span{color:#666;text-align:right}
+.productInfo{border-bottom:1px solid #c9c1b4;padding:16px 0}
+.productInfo summary{cursor:pointer;font-size:10px;font-weight:700;letter-spacing:.1em}
+.productInfo p{color:#666;font-size:12px;line-height:1.7}
+.mainPhoto{position:relative}
+.zoomHint{position:absolute;right:16px;bottom:16px;background:#eeeae1dd;border:1px solid #aaa;padding:10px 12px;font-size:9px;letter-spacing:.08em}
+.productThumbs{grid-template-columns:repeat(5,1fr)}
+.productThumbs button{height:92px;background:#d4cec2;border:1px solid transparent;color:#81786a;font-size:9px;cursor:pointer}
+.productThumbs button:hover{border-color:#8b6a34}
+.sizeModal{display:none;position:fixed;inset:0;background:#000b;z-index:120;place-items:center;padding:20px}
+.sizeModal.show{display:grid}
+.sizeModal>div{position:relative;width:min(520px,100%);max-height:85vh;overflow:auto;background:#eeeae1;padding:36px;color:#111}
+.sizeModal #closeSize{position:absolute;right:18px;top:15px;border:0;background:none;font-size:26px;cursor:pointer}
+.sizeModal h2{font:36px Georgia;margin:10px 0}
+.sizeModal p{color:#666;font-size:12px;line-height:1.6}
+.sizeModal table{width:100%;border-collapse:collapse;margin-top:20px;font-size:12px}
+.sizeModal th,.sizeModal td{text-align:left;padding:12px;border-bottom:1px solid #c8c0b4}
+@media(max-width:560px){
+ .productPage{gap:25px}
+ .mainPhoto{height:470px}
+ .productThumbs{display:flex;overflow-x:auto}
+ .productThumbs button{min-width:86px}
+ .productDetails{padding-top:0}
+ .productDetails h1{font-size:43px}
+ .productActions{grid-template-columns:1fr}
+ .buy,.buyNow{min-height:54px}
+ .sizeHead{gap:12px}
+ .productBenefits p{font-size:11px}
+}
