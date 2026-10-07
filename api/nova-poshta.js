@@ -1,6 +1,9 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
+    return res.status(405).json({
+      ok: false,
+      error: "Method Not Allowed"
+    });
   }
 
   try {
@@ -10,11 +13,19 @@ export default async function handler(req, res) {
       throw new Error("Nova Poshta API key is missing");
     }
 
-    const { action, search, cityRef } = req.body || {};
+    const {
+      action,
+      search,
+      cityRef
+    } = req.body || {};
 
     let modelName;
     let calledMethod;
     let methodProperties = {};
+
+    // =========================
+    // ПОШУК МІСТ
+    // =========================
 
     if (action === "cities") {
       modelName = "Address";
@@ -25,7 +36,13 @@ export default async function handler(req, res) {
         Limit: "20",
         Page: "1"
       };
-    } else if (action === "warehouses") {
+    }
+
+    // =========================
+    // ВІДДІЛЕННЯ / ПОШТОМАТИ
+    // =========================
+
+    else if (action === "warehouses") {
       if (!cityRef) {
         return res.status(400).json({
           ok: false,
@@ -37,7 +54,7 @@ export default async function handler(req, res) {
       calledMethod = "getWarehouses";
 
       methodProperties = {
-        SettlementRef: String(cityRef).slice(0, 100),
+        CityRef: String(cityRef).slice(0, 100),
         Page: "1",
         Limit: "100"
       };
@@ -46,20 +63,32 @@ export default async function handler(req, res) {
         methodProperties.FindByString =
           String(search).slice(0, 100);
       }
-    } else {
+    }
+
+    // =========================
+    // НЕВІДОМА ДІЯ
+    // =========================
+
+    else {
       return res.status(400).json({
         ok: false,
         error: "Unknown action"
       });
     }
 
+    // =========================
+    // ЗАПИТ ДО NOVA POSHTA
+    // =========================
+
     const response = await fetch(
       "https://api.novaposhta.ua/v2.0/json/",
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
           apiKey,
           modelName,
@@ -71,19 +100,32 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
+    // =========================
+    // ПЕРЕВІРКА ПОМИЛОК
+    // =========================
+
     if (!response.ok || data.success !== true) {
-      console.error("NOVA POSHTA API ERROR:", data);
+      console.error(
+        "NOVA POSHTA API ERROR:",
+        data
+      );
 
       return res.status(502).json({
         ok: false,
-        error: "Nova Poshta API error"
+        error: "Nova Poshta API error",
+        details: data.errors || []
       });
     }
 
+    // =========================
+    // УСПІШНА ВІДПОВІДЬ
+    // =========================
+
     return res.status(200).json({
       ok: true,
-      data: data.data
+      data: data.data || []
     });
+
   } catch (error) {
     console.error(
       "NOVA POSHTA ERROR:",
