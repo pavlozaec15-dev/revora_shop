@@ -158,3 +158,24 @@
  .heroControls{right:5vw;bottom:8px}
  .homeDarkProducts{grid-template-columns:1fr 1fr}
 }
+
+
+/* REVORA advanced catalog filters */
+.filterToggle{display:none;width:100%;padding:14px 0;border:0;border-block:1px solid #aaa;background:transparent;text-align:left;font-size:10px;font-weight:700;letter-spacing:.12em}
+.filterToggle span{float:right;font-size:16px}
+.catalogTools{grid-template-columns:1.5fr repeat(3,1fr) 1.25fr 1.2fr;align-items:stretch}
+.priceFilter{border:1px solid #aaa;padding:9px 12px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.priceFilter label{display:flex;justify-content:space-between;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#666}
+.priceFilter input{padding:0;border:0;width:100%;accent-color:#8b6a34}
+.noProducts{grid-column:1/-1;padding:70px 0;text-align:center;border-block:1px solid #bbb}
+.noProducts h3{font:32px Georgia;margin:0 0 8px}
+.noProducts p{color:#777;font-size:12px}
+@media(max-width:1100px){.catalogTools{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){
+ .filterToggle{display:block;margin:28px 0 0}
+ .catalogTools{display:none;margin:0 0 18px;padding:14px 0;border-bottom:1px solid #aaa}
+ .catalogTools.mobileOpen{display:grid;grid-template-columns:1fr}
+ .catalogTools input,.catalogTools select{min-height:48px}
+ .priceFilter{min-height:58px}
+ .catalogMeta{margin-top:18px}
+}
