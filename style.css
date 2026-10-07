@@ -123,3 +123,38 @@
  .sizeHead{gap:12px}
  .productBenefits p{font-size:11px}
 }
+
+
+/* REVORA homepage 2026 */
+.homeHero{padding:0;min-height:690px}
+.heroSlides{position:relative;min-height:690px}
+.heroSlide{position:absolute;inset:0;padding:92px 7vw;opacity:0;visibility:hidden;transform:translateX(14px);transition:opacity .55s ease,transform .55s ease,visibility .55s}
+.heroSlide.active{opacity:1;visibility:visible;transform:none}
+.heroSlide:nth-child(2){background:radial-gradient(circle at 78% 42%,#26221c 0,#12110f 28%,#090909 58%)}
+.heroSlide:nth-child(3){background:radial-gradient(circle at 78% 42%,#382c1b 0,#17130e 28%,#090909 58%)}
+.heroControls{position:absolute;z-index:5;right:7vw;bottom:30px;display:flex;align-items:center;gap:13px}
+.heroControls button{width:38px;height:38px;border:1px solid #555;background:#0c0c0caa;color:#eee;cursor:pointer}
+.heroControls span{min-width:55px;text-align:center;color:#888;font-size:9px;letter-spacing:.1em}
+.homeView{display:block;margin:0 14px 14px;text-align:center;text-decoration:none}
+.homeDarkProducts .product{background:#191919}
+.homeDarkProducts .productImg{background:linear-gradient(145deg,#25231f,#121212);color:#665f55}
+.homeDarkProducts .productLink{color:#f4f1e9}
+.homeDarkProducts .info small{color:#777}
+.homeDarkProducts .add{background:#eeeae1;color:#111}
+.categories a{color:#111;text-decoration:none;transition:padding .2s,color .2s}
+.categories a:hover{padding-left:10px;color:#8b6a34}
+@media(max-width:900px){
+ .homeHero,.heroSlides{min-height:760px}
+ .heroSlide{padding:70px 6vw 440px}
+ .heroSlide .heroVisual{top:auto;bottom:65px}
+ .heroControls{right:6vw;bottom:18px}
+}
+@media(max-width:560px){
+ .homeHero,.heroSlides{min-height:720px}
+ .heroSlide{padding:55px 5vw 390px}
+ .heroSlide .heroCopy h1{font-size:48px}
+ .heroSlide .heroVisual{left:5vw;width:90%;height:330px;bottom:52px}
+ .heroSlide .heroVisual strong{font-size:48px}
+ .heroControls{right:5vw;bottom:8px}
+ .homeDarkProducts{grid-template-columns:1fr 1fr}
+}
