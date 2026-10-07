@@ -179,3 +179,42 @@
  .priceFilter{min-height:58px}
  .catalogMeta{margin-top:18px}
 }
+
+
+/* REVORA customer account */
+.accountPage{background:#eeeae1;color:#111;min-height:90vh;padding:65px 7vw 110px}
+.accountHero{max-width:800px;margin-bottom:55px}
+.accountHero h1{font:clamp(55px,7vw,95px)/.9 Georgia;margin:12px 0 22px}
+.accountHero p{color:#777;line-height:1.6}
+.accountGuest{max-width:560px;background:#f7f3eb;border:1px solid #d0c8bb;padding:38px}
+.accountGuest h2,.accountHead h2{font:36px Georgia;margin:10px 0}
+.accountGuest p{color:#666;font-size:12px;line-height:1.7}
+.accountGuest form{display:grid;gap:12px;margin-top:25px}
+.accountGuest label{display:flex;flex-direction:column;gap:7px;font-size:10px;letter-spacing:.08em}
+.accountGuest input{padding:15px;border:1px solid #aaa;background:transparent}
+.accountGuest button{padding:16px;background:#111;color:#fff;border:0;cursor:pointer}
+.accountHead{display:flex;justify-content:space-between;align-items:end;margin-bottom:25px}
+.accountHead button{border:0;background:none;text-decoration:underline;cursor:pointer;font-size:10px}
+.accountStats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.accountStats article{background:#111;color:#fff;padding:28px;display:flex;flex-direction:column;gap:9px}
+.accountStats strong{font:30px Georgia;color:#c6a15b}
+.accountStats span{font-size:10px;color:#888}
+.vipCard{margin:10px 0 40px;padding:30px;background:#d8cdbb;display:grid;grid-template-columns:1fr 1fr;gap:35px;align-items:end}
+.vipCard h3{font:27px Georgia;margin:8px 0}
+.vipCard p{font-size:12px;color:#625b51;line-height:1.6}
+.vipBar{height:5px;background:#b9ad99;margin-top:12px;overflow:hidden}
+.vipBar i{display:block;height:100%;width:0;background:#111;transition:width .4s}
+.accountGrid{display:grid;grid-template-columns:1.4fr .6fr;gap:25px}
+.accountGrid>section{background:#f7f3eb;border:1px solid #d0c8bb;padding:28px}
+.accountSectionTitle{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #d0c8bb;padding-bottom:15px}
+.accountSectionTitle h3{font:25px Georgia;margin:0}
+.accountSectionTitle a{font-size:9px;color:#111}
+.accountOrder{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:18px 0;border-bottom:1px solid #ddd4c6}
+.accountOrder div{display:flex;flex-direction:column;gap:5px}
+.accountOrder small{color:#8b6a34}
+.accountOrder b{font-size:12px}
+.accountEmpty{text-align:center;padding:45px 10px;color:#777;font-size:12px}
+.accountEmpty span{font-size:30px;color:#8b6a34}
+.accountEmpty a{color:#111}
+[hidden]{display:none!important}
+@media(max-width:700px){.accountPage{padding:40px 4vw 80px}.accountStats{grid-template-columns:1fr}.vipCard,.accountGrid{grid-template-columns:1fr}.accountGuest{padding:25px 18px}.accountOrder{grid-template-columns:1fr 1fr}.accountOrder div:last-child{grid-column:1/-1}.accountHero h1{font-size:50px}}
