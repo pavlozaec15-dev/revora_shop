@@ -1,1 +1,19 @@
-const products=[{n:"Пуховик REVORA",p:4000,o:4500,b:"SALE"},{n:"Зіп худі",p:2600,b:"NEW"},{n:"Куртка / вітровка",p:3500,b:"TOP"},{n:"Шорти",p:1800,o:2100,b:"SALE"}];const grid=document.querySelector("#products");let count=Number(localStorage.getItem("revoraCart")||0);document.querySelector("#count").textContent=count;products.forEach(x=>{const e=document.createElement("article");e.className="product";e.innerHTML=`<div class="badge">${x.b}</div><div class="productImg">ТВОЄ ФОТО<br>ТОВАРУ</div><div class="info"><b>${x.n}</b><p class="price">${x.p.toLocaleString("uk-UA")} ₴ ${x.o?`<span class="old">${x.o.toLocaleString("uk-UA")} ₴</span>`:""}</p><button class="add">ДОДАТИ В КОШИК</button></div>`;grid.appendChild(e)});document.querySelectorAll(".add").forEach(b=>b.onclick=()=>{count++;localStorage.setItem("revoraCart",count);document.querySelector("#count").textContent=count;b.textContent="ДОДАНО ✓";setTimeout(()=>b.textContent="ДОДАТИ В КОШИК",900)});const drawer=document.querySelector("#drawer"),shade=document.querySelector("#shade");function bag(x){drawer.classList.toggle("open",x);shade.classList.toggle("open",x)}document.querySelector("#cart").onclick=()=>bag(true);document.querySelector("#close").onclick=()=>bag(false);shade.onclick=()=>bag(false);document.querySelector("#menu").onclick=()=>document.querySelector("#mobileNav").classList.toggle("open");document.querySelectorAll("#mobileNav a").forEach(a=>a.onclick=()=>document.querySelector("#mobileNav").classList.remove("open"));setTimeout(()=>document.querySelector("#intro")?.remove(),1300);
+const homeProducts=[
+{id:"puffer",n:"Пуховик REVORA",p:4000,o:4500,b:"SALE"},
+{id:"zip",n:"Зіп худі",p:2600,b:"NEW"},
+{id:"jacket",n:"Куртка / вітровка",p:3500,b:"TOP"},
+{id:"shorts",n:"Шорти",p:1800,o:2100,b:"SALE"}
+];
+const moneyHome=n=>n.toLocaleString("uk-UA")+" ₴";
+function homeCard(x){return `<article class="product"><a class="productLink" href="product.html?id=${x.id}"><div class="productImg">ТВОЄ ФОТО<br>ТОВАРУ</div><div class="badge">${x.b}</div><div class="info"><b>${x.n}</b><p class="price">${moneyHome(x.p)} ${x.o?`<span class="old">${moneyHome(x.o)}</span>`:""}</p></div></a><a class="add homeView" href="product.html?id=${x.id}">ПЕРЕГЛЯНУТИ</a></article>`}
+const grid=document.querySelector("#products");if(grid)grid.innerHTML=homeProducts.map(homeCard).join("");
+const popular=document.querySelector("#popularProducts");if(popular)popular.innerHTML=[homeProducts[2],homeProducts[0],homeProducts[1],homeProducts[3]].map(homeCard).join("");
+let slides=[...document.querySelectorAll(".heroSlide")],current=0,timer;
+function showSlide(i){if(!slides.length)return;current=(i+slides.length)%slides.length;slides.forEach((s,n)=>s.classList.toggle("active",n===current));const no=document.querySelector("#heroNo");if(no)no.textContent=String(current+1).padStart(2,"0")+" / "+String(slides.length).padStart(2,"0")}
+function autoHero(){clearInterval(timer);timer=setInterval(()=>showSlide(current+1),5000)}
+document.querySelector("#heroPrev")?.addEventListener("click",()=>{showSlide(current-1);autoHero()});
+document.querySelector("#heroNext")?.addEventListener("click",()=>{showSlide(current+1);autoHero()});
+showSlide(0);autoHero();
+document.querySelector("#menu")?.addEventListener("click",()=>document.querySelector("#mobileNav")?.classList.toggle("open"));
+document.querySelectorAll("#mobileNav a").forEach(a=>a.addEventListener("click",()=>document.querySelector("#mobileNav")?.classList.remove("open")));
+setTimeout(()=>document.querySelector("#intro")?.remove(),1300);
