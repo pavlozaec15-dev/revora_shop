@@ -662,6 +662,8 @@ document.addEventListener(
    ЗАМОВЛЕННЯ
 ========================= */
 
+let pendingOrderNumber = null;
+
 form.onsubmit =
   async event => {
 
@@ -708,10 +710,7 @@ form.onsubmit =
     const fd =
       new FormData(form);
 
-    const number =
-      "RV" +
-      String(Date.now())
-        .slice(-6);
+    const number = pendingOrderNumber ||= "RV-" + crypto.randomUUID();
 
     const order = {
 
@@ -765,12 +764,17 @@ form.onsubmit =
 
       if (
         !response.ok ||
-        result.ok !== true
+        result.ok !== true ||
+        result.stored !== true
       ) {
         throw new Error(
           "Order send failed"
         );
       }
+
+      order.total = result.total;
+      order.items = result.items;
+      pendingOrderNumber = null;
 
       const orders =
         JSON.parse(
