@@ -1,0 +1,91 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>REVORA — Товари</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#0b0c0e;color:#f4eee5;font:14px/1.5 system-ui,Arial}a{color:#d2ad75;text-decoration:none}button{cursor:pointer}header{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:22px 5vw;border-bottom:1px solid #34302b}header strong{font:700 27px Georgia;letter-spacing:5px}.wrap{max-width:1150px;margin:auto;padding:35px 5vw}.tag{font-size:11px;color:#c4a171;letter-spacing:2px}h1{font:38px Georgia;margin:8px 0}p{color:#a8a6a3}.panel{margin:25px 0;padding:22px;border:1px solid #393635;background:#151619;border-radius:12px}.bar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.btn{border:1px solid #8d6d42;color:#16120d;background:#c9a875;padding:11px 17px;border-radius:6px;font-weight:700}.secondary{background:#232324;color:#e4d0ab}.btn:disabled{opacity:.5}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}label{display:flex;flex-direction:column;gap:7px;font-size:12px;color:#d4d0c7}input,select,textarea{font:inherit;padding:12px;border:1px solid #54504b;background:#101113;color:white;border-radius:6px;width:100%}input[type=checkbox]{width:auto}.wide{grid-column:1/-1}.check{flex-direction:row;align-items:center}.row{display:flex;align-items:center;gap:14px;padding:12px;border-top:1px solid #323232}.thumb{width:75px;height:80px;object-fit:cover;background:#26231f;border-radius:5px}.info{flex:1;min-width:0}.info b{display:block;overflow-wrap:anywhere}.info small{color:#999}.photos{display:flex;flex-wrap:wrap;gap:10px}.photo{display:flex;flex-direction:column;gap:4px}.photo img{width:94px;height:110px;object-fit:cover}.photo button{background:#272525;border:1px solid #75604d;color:#ddd;font-size:11px}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}#editor[hidden],#app[hidden]{display:none}#msg{color:#e5c28d}#auth{max-width:500px;margin:12vh auto;padding:30px;background:#171718;text-align:center;border:1px solid #665035;border-radius:12px}#auth button{margin:15px 0}#status{color:#e5c28d;margin:15px 0}@media(max-width:650px){.grid{grid-template-columns:1fr}.row{flex-wrap:wrap}.row .btn{width:100%}header{flex-wrap:wrap}h1{font-size:32px}}
+</style></head><body>
+<div id="auth"><h1>REVORA ADMIN</h1><p id="authText">Перевіряємо права доступу…</p><button class="btn" id="login" hidden>Увійти через Google →</button><p><a href="/admin/">← Адмін-панель</a></p></div>
+<div id="app" hidden><header><strong>REVORA</strong><nav><a href="/admin/">← ПАНЕЛЬ</a> &nbsp; / &nbsp; ТОВАРИ</nav><button class="btn secondary" id="logout">ВИЙТИ</button></header>
+<main class="wrap"><div class="tag">REVORA · КАТАЛОГ</div><h1>Керування товарами</h1><p>Фото, ціна, розміри, опис і публікація. Дані зберігаються в Supabase.</p>
+<section class="panel"><div class="bar"><b id="count">Товари</b><div><button class="btn" id="newBtn">+ ДОДАТИ ТОВАР</button> <button class="btn secondary" id="refresh">ОНОВИТИ</button></div></div><p id="msg"></p><div id="list"></div></section>
+<section class="panel" id="editor" hidden><div class="bar"><h2 id="editorTitle">Новий товар</h2><button class="btn secondary" id="closeEditor">ЗАКРИТИ ×</button></div>
+<form id="form"><div class="grid">
+<label>Назва *<input name="name" required minlength="2" maxlength="180"></label>
+<label>Категорія *<select name="category" required><option value="">Обери категорію</option><option>Пуховики</option><option>Худі</option><option>Куртки</option><option>Шорти</option><option>Футболки</option><option>Штани</option><option>Кросівки</option><option>Аксесуари</option><option>Світшоти</option><option>Жилети</option><option>Сумки</option><option>Головні убори</option></select></label>
+<label>Ціна, грн *<input type="number" name="price" required min="0" max="9999999" step="1"></label>
+<label>Стара ціна, грн<input type="number" name="old_price" min="0" max="9999999" step="1"></label>
+<label>Розміри через кому<input name="sizes" placeholder="XS, S, M, L, XL"></label>
+<label>Позначка<select name="badge"><option value="">Без позначки</option><option>NEW</option><option>SALE</option><option>TOP</option><option>HIT</option><option>LIMITED</option></select></label>
+<label class="wide">Опис товару<textarea name="description" rows="4" maxlength="6000"></textarea></label>
+<label class="wide">Фотографії (JPG, PNG або WebP, максимум 10 МБ на фото)<input type="file" id="upload" accept="image/jpeg,image/png,image/webp" multiple></label>
+<div class="photos wide" id="photos"></div>
+<label class="wide check"><input name="published" type="checkbox"> Опублікувати товар</label>
+</div><div class="actions"><button class="btn" id="save" type="submit">ЗБЕРЕГТИ ТОВАР</button><button class="btn secondary" id="cancel" type="button">СКАСУВАТИ</button></div><p id="status"></p></form></section>
+</main></div>
+<script type="module">
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const sb=createClient('https://mqsytqicykgtbjjvaroa.supabase.co','sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH',{auth:{flowType:'pkce',detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
+const $=id=>document.getElementById(id),money=n=>Number(n).toLocaleString('uk-UA')+' ₴';
+let owner=false,items=[],editing=null,photos=[];
+$('login').onclick=async()=>{await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/admin/products.html'}})};
+$('logout').onclick=async()=>{await sb.auth.signOut();location.href='/admin/'};
+function message(s){$('status').textContent=s}
+function drawPhotos(){
+ $('photos').replaceChildren();
+ photos.forEach((url,i)=>{const box=document.createElement('div');box.className='photo';const img=document.createElement('img');img.src=url;img.alt='Фото товару';const b=document.createElement('button');b.type='button';b.textContent='ПРИБРАТИ ×';b.onclick=()=>{photos.splice(i,1);drawPhotos()};box.append(img,b);$('photos').append(box)});
+}
+function openEditor(p){
+ if(!owner)return;
+ editing=p?.id||null;$('form').reset();
+ for(const name of ['name','category','description','badge'])$('form').elements[name].value=p?.[name]||'';
+ $('form').elements.price.value=p?.price??'';
+ $('form').elements.old_price.value=p?.old_price??'';
+ $('form').elements.sizes.value=(p?.sizes||[]).join(', ');
+ $('form').elements.published.checked=Boolean(p?.published);
+ photos=[...(p?.image_urls||[])];drawPhotos();message('');
+ $('editorTitle').textContent=p?'Редагувати товар':'Новий товар';
+ $('editor').hidden=false;$('editor').scrollIntoView({behavior:'smooth'});
+}
+function closeEditor(){$('editor').hidden=true;editing=null;photos=[]}
+$('newBtn').onclick=()=>openEditor(null);
+$('cancel').onclick=closeEditor;$('closeEditor').onclick=closeEditor;$('refresh').onclick=load;
+async function load(){
+ const {data,error}=await sb.from('products').select('*').order('created_at',{ascending:false}).limit(300);
+ if(error){$('msg').textContent='Не вдалося завантажити товари: '+error.message;return}
+ items=data||[];$('count').textContent='Товари: '+items.length;
+ $('msg').textContent='Збережені товари можна змінювати. Публічний каталог підключимо наступним кроком.';
+ $('list').replaceChildren();
+ if(!items.length){const p=document.createElement('p');p.textContent='Товарів ще немає. Натисни «Додати товар».';$('list').append(p)}
+ items.forEach(p=>{const row=document.createElement('div');row.className='row';const img=document.createElement('img');img.className='thumb';img.alt='';if(p.image_urls?.[0])img.src=p.image_urls[0];const info=document.createElement('div');info.className='info';const b=document.createElement('b');b.textContent=p.name;const desc=document.createElement('small');desc.textContent=p.category+' · '+money(p.price)+' · '+(p.published?'Опубліковано':'Чернетка');info.append(b,desc);const edit=document.createElement('button');edit.className='btn secondary';edit.textContent='РЕДАГУВАТИ';edit.onclick=()=>openEditor(p);row.append(img,info,edit);$('list').append(row)});
+}
+$('form').onsubmit=async ev=>{
+ ev.preventDefault();if(!owner)return;
+ const btn=$('save');btn.disabled=true;message('Завантажуємо та зберігаємо…');
+ try{
+  const files=Array.from($('upload').files);
+  if(files.length+photos.length>10)throw Error('Максимум 10 фотографій');
+  for(const f of files){
+   if(!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>10*1024*1024)throw Error('Фото має бути JPG, PNG або WebP до 10 МБ');
+   const ext=f.type==='image/png'?'png':f.type==='image/webp'?'webp':'jpg';
+   const path=crypto.randomUUID()+'.'+ext;
+   const {data,error}=await sb.storage.from('revora-products').upload(path,f,{contentType:f.type});
+   if(error)throw Error('Не вдалося завантажити фото: '+error.message);
+   photos.push(sb.storage.from('revora-products').getPublicUrl(data.path).data.publicUrl);
+  }
+  drawPhotos();
+  const form=$('form').elements;
+  if(form.published.checked&&!photos.length)throw Error('Для публікації додай хоча б одне фото');
+  const record={name:form.name.value.trim(),category:form.category.value,description:form.description.value.trim(),price:Number(form.price.value),old_price:form.old_price.value?Number(form.old_price.value):null,sizes:form.sizes.value.split(',').map(x=>x.trim()).filter(Boolean),badge:form.badge.value,image_urls:photos,published:form.published.checked,updated_at:new Date().toISOString()};
+  const q=editing?sb.from('products').update(record).eq('id',editing):sb.from('products').insert(record);
+  const {error}=await q.select('id').single();
+  if(error)throw Error(error.message);
+  closeEditor();await load();$('msg').textContent='✅ Товар збережено у Supabase.';
+ }catch(e){message('Помилка: '+e.message)}finally{btn.disabled=false}
+};
+async function auth(){
+ const {data:{user}}=await sb.auth.getUser();
+ if(!user){$('authText').textContent='Увійди через Google, щоб керувати товарами.';$('login').hidden=false;return}
+ const {data,error}=await sb.from('admin_users').select('role').eq('user_id',user.id).eq('active',true).maybeSingle();
+ if(error||!data||!['owner','editor'].includes(data.role)){$('authText').textContent='Потрібні права власника або редактора товарів.';return}
+ owner=true;$('auth').hidden=true;$('app').hidden=false;await load();
+}
+auth().catch(e=>{$('authText').textContent='Не вдалося перевірити доступ: '+e.message});
+</script></body></html>
