@@ -10,7 +10,7 @@ export async function onRequestPost({request,env}) {
   const url=env.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/calculate_promo_discount';
   const response=await fetch(url,{
    method:'POST',
-   headers:{'Content-Type':'application/json',apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY},
+   headers:{'Content-Type':'application/json',apikey:env.SUPABASE_SERVICE_ROLE_KEY,...(env.SUPABASE_SERVICE_ROLE_KEY.startsWith('sb_secret_') ? {} : {Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY})},
    body:JSON.stringify({p_code:code,p_subtotal:subtotal}),
    signal:AbortSignal.timeout(10000)
   });
