@@ -2,7 +2,7 @@
 *{box-sizing:border-box}body{margin:0;background:#0c0d0f;color:#f6f0e8;font:14px/1.5 system-ui,Arial}a{color:#d9b786;text-decoration:none}button,select{font:inherit;border:1px solid #806d4e;border-radius:7px;padding:10px 14px;background:#222226;color:white}button{cursor:pointer}button:disabled{opacity:.5}.primary{background:#caaa79;color:#17130e;font-weight:700}header{padding:24px 5vw;border-bottom:1px solid #393632;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}header b{font:700 26px Georgia;letter-spacing:5px}main{max-width:1150px;margin:auto;padding:30px 5vw}h1{font:40px Georgia;margin:0 0 10px}h2{font:24px Georgia}p{color:#b9b3ab}.panel{border:1px solid #393532;background:#161719;padding:22px;border-radius:12px;margin:22px 0}.row{border-top:1px solid #3d3937;padding:15px 0;display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}.row small{display:block;color:#aaa}.row b{overflow-wrap:anywhere}.details{white-space:pre-line;overflow-wrap:anywhere;line-height:1.9}.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}#app[hidden],#auth[hidden],#detail[hidden]{display:none}#notice{color:#e5c18c}#auth{max-width:500px;margin:11vh auto;text-align:center}.small{font-size:12px;color:#999}</style></head><body>
 <section class="panel" id="auth"><h1>REVORA ADMIN</h1><p id="authMessage">Перевіряємо доступ…</p><button id="login" class="primary" hidden>Увійти через Google →</button><p><a href="/admin/">← Адмін-панель</a></p></section>
 <div id="app" hidden><header><b>REVORA</b><nav><a href="/admin/">ПАНЕЛЬ</a> · <a href="/admin/products.html">ТОВАРИ</a> · ЗАМОВЛЕННЯ</nav><button id="logout">ВИЙТИ</button></header>
-<main><h1>Замовлення</h1><p>Переглядай дані покупців і змінюй статус замовлення.</p><button id="refresh" class="primary">ОНОВИТИ СПИСОК</button><p id="notice" role="status"></p><div id="orders" class="panel"></div>
+<main><h1>Замовлення</h1><p>Переглядай дані покупців і змінюй статус замовлення.</p><button id="refresh" class="primary">ОНОВИТИ СПИСОК</button><div class="actions" style="margin-top:15px"><label for="orderSearch">Пошук замовлень <input id="orderSearch" type="search" placeholder="Номер або ім’я покупця"></label><label for="orderFilter">Статус <select id="orderFilter"><option value="all">Усі</option><option value="new">Нові</option><option value="confirmed">Підтверджені</option><option value="shipped">Відправлені</option><option value="completed">Завершені</option><option value="cancelled">Скасовані</option></select></label></div><p id="notice" role="status"></p><div id="orders" class="panel"></div>
 <section id="detail" class="panel" hidden><div class="actions" style="justify-content:space-between"><h2>Деталі замовлення</h2><button id="close">ЗАКРИТИ</button></div><div id="info" class="details"></div><div class="actions" style="margin-top:20px"><label for="status">Статус:</label><select id="status"><option value="new">Нове</option><option value="confirmed">Підтверджено</option><option value="shipped">Відправлено</option><option value="completed">Завершено</option><option value="cancelled">Скасовано</option></select><button class="primary" id="save">ЗБЕРЕГТИ СТАТУС</button><button id="deleteOrder" type="button" hidden style="border-color:#a64b4b;color:#ffbaba">ВИДАЛИТИ ЗАМОВЛЕННЯ</button></div></section></main></div>
 <script type="module">
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -10,7 +10,9 @@ const sb=createClient('https://mqsytqicykgtbjjvaroa.supabase.co','sb_publishable
 const $=id=>document.getElementById(id);
 const money=n=>Number(n||0).toLocaleString('uk-UA')+' ₴';
 const names={new:'Нове',confirmed:'Підтверджено',shipped:'Відправлено',completed:'Завершено',cancelled:'Скасовано'};
-let selected=null,canDelete=false;
+let selected=null,canDelete=false,allOrders=[];
+$('orderSearch').addEventListener('input',renderOrders);
+$('orderFilter').addEventListener('change',renderOrders);
 $('login').onclick=async()=>{const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/admin/orders.html'}});if(error)$('authMessage').textContent=error.message};
 $('logout').onclick=async()=>{await sb.auth.signOut();location.href='/admin/'};
 $('refresh').onclick=load;
@@ -25,10 +27,16 @@ async function load(){
 $('notice').textContent='Завантажуємо замовлення…';
 const {data,error}=await sb.from('orders').select('id,number,customer_name,customer_phone,delivery_city,delivery_branch,delivery_type,payment_method,items,notes,total_amount,discount_amount,promo_code,status,created_at').order('created_at',{ascending:false}).limit(200);
 if(error){$('notice').textContent='Помилка завантаження: '+error.message;return}
-$('notice').textContent='Замовлень: '+data.length;
+allOrders=data||[];renderOrders();
+}
+function renderOrders(){
+const query=$('orderSearch').value.trim().toLocaleLowerCase('uk-UA');
+const status=$('orderFilter').value;
+const visible=allOrders.filter(o=>(status==='all'||o.status===status)&&(!query||String(o.number||'').toLocaleLowerCase('uk-UA').includes(query)||String(o.customer_name||'').toLocaleLowerCase('uk-UA').includes(query)));
+$('notice').textContent='Показано '+visible.length+' із '+allOrders.length+' замовлень';
 $('orders').replaceChildren();
-if(!data.length){$('orders').textContent='Замовлень поки немає.';return}
-data.forEach(o=>{const row=document.createElement('div');row.className='row';const info=document.createElement('div');const name=document.createElement('b');name.textContent=o.number;const sub=document.createElement('small');sub.textContent=o.customer_name+' · '+money(o.total_amount)+' · '+(names[o.status]||o.status);info.append(name,sub);const btn=document.createElement('button');btn.textContent='ВІДКРИТИ';btn.onclick=()=>openOrder(o);row.append(info,btn);$('orders').append(row)});
+if(!visible.length){$('orders').textContent=allOrders.length?'За цим пошуком замовлень немає.':'Замовлень поки немає.';return}
+visible.forEach(o=>{const row=document.createElement('div');row.className='row';const info=document.createElement('div');const name=document.createElement('b');name.textContent=o.number;const sub=document.createElement('small');sub.textContent=o.customer_name+' · '+money(o.total_amount)+' · '+(names[o.status]||o.status);info.append(name,sub);const btn=document.createElement('button');btn.textContent='ВІДКРИТИ';btn.onclick=()=>openOrder(o);row.append(info,btn);$('orders').append(row)});
 }
 $('deleteOrder').onclick=async()=>{
  if(!canDelete||!selected)return;
