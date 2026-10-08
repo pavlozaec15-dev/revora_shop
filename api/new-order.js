@@ -88,7 +88,46 @@ ${customer.comment || "Немає"}`;
       });
     }
 
-    return res.status(200).json({ ok: true });
+    // Persist the order when server-side Supabase access is configured.
+    // Never expose SUPABASE_SERVICE_ROLE_KEY to the browser.
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    let stored = false;
+    if (supabaseUrl && serviceRoleKey) {
+      try {
+        const record = {
+          number: String(order.number || ""),
+          customer_name: [customer.name, customer.surname].filter(Boolean).join(" "),
+          customer_phone: String(customer.phone || ""),
+          customer_city: String(customer.city || ""),
+          delivery_type: String(customer.delivery || ""),
+          warehouse: String(customer.warehouse || ""),
+          payment_method: String(customer.payment || ""),
+          comment: String(customer.comment || ""),
+          items: items.map(item => ({
+            id: item.id, name: item.name, size: item.size,
+            qty: Number(item.qty || 1), price: Number(item.price || 0)
+          })),
+          total: Number(order.total || 0),
+          status: "Прийнято"
+        };
+        const dbResponse = await fetch(supabaseUrl.replace(/\\/$/, "") + "/rest/v1/orders?on_conflict=number", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": serviceRoleKey,
+            "Authorization": "Bearer " + serviceRoleKey,
+            "Prefer": "resolution=ignore-duplicates,return=minimal"
+          },
+          body: JSON.stringify(record)
+        });
+        if (!dbResponse.ok) throw new Error("Database rejected order: " + dbResponse.status);
+        stored = true;
+      } catch (dbError) {
+        console.error("ORDER DB SAVE FAILED:", dbError?.message || dbError);
+      }
+    }
+    return res.status(200).json({ ok: true, stored });
   } catch (error) {
     console.error("NEW ORDER ERROR:", error?.message || error);
     return res.status(500).json({
