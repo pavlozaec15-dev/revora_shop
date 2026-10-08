@@ -43,7 +43,7 @@ async function handler(req, res, env) {
   }
   const url = env.SUPABASE_URL;
   const key = env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return res.status(503).json({ ok: false, error: 'Збереження замовлень ще не налаштоване.' });
+  if (!url || !key) return res.status(503).json({ ok: false, error: !url ? 'Cloudflare: відсутня змінна SUPABASE_URL.' : 'Cloudflare: відсутня змінна SUPABASE_SERVICE_ROLE_KEY.' });
   let saved;
   let inserted = false;
   try {
