@@ -1,5 +1,18 @@
 import { REVORA_PRODUCTS as catalog } from '../_catalog.js';
 
+async function getOrderCatalog(env) {
+  const staticItems = catalog;
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return staticItems;
+  const endpoint = env.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/products?published=eq.true&select=id,name,price,sizes&limit=500';
+  const response = await fetch(endpoint, {
+    headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY },
+    signal: AbortSignal.timeout(10000)
+  });
+  if (!response.ok) throw new Error('Product validation unavailable: '+response.status);
+  const active = await response.json();
+  return [...staticItems, ...active.map(x=>({id:x.id,name:x.name,price:Number(x.price),sizes:x.sizes||[]}))];
+}
+
 const text = (value, max, required = true) => {
   if (typeof value !== 'string' || value.trim().length > max || (required && !value.trim())) throw new Error('Invalid customer details');
   return value.trim();
@@ -12,13 +25,16 @@ async function handler(req, res, env) {
     return res.status(405).json({ ok: false, error: 'Method Not Allowed' });
   }
   let record;
+  let currentCatalog;
+  try { currentCatalog = await getOrderCatalog(env); }
+  catch { return res.status(503).json({ok:false,error:'Тимчасово не вдалося перевірити товари. Спробуйте ще раз.'}); }
   try {
     const order = req.body;
     const customer = order?.customer;
     if (!customer || !/^RV-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(order.number)) throw new Error('Invalid order number');
     if (!Array.isArray(order.items) || !order.items.length || order.items.length > 50) throw new Error('Invalid cart');
     const items = order.items.map(item => {
-      const product = catalog.find(p => p.id === item?.id);
+      const product = currentCatalog.find(p => p.id === item?.id);
       if (!product || !product.sizes.includes(item.size) || !Number.isInteger(item.qty) || item.qty < 1 || item.qty > 20) throw new Error('Invalid cart item');
       return { id: product.id, name: product.name, size: item.size, qty: item.qty, price: product.price };
     });
