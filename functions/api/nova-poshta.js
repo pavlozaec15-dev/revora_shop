@@ -98,7 +98,13 @@ async function handler(req, res, env) {
       }
     );
 
-    const data = await response.json();
+    const raw = await response.text();
+    let data;
+    try { data = JSON.parse(raw); }
+    catch {
+      console.error("NOVA POSHTA NON-JSON RESPONSE", response.status, raw.length);
+      return res.status(502).json({ok:false,error:"Нова пошта повернула некоректну відповідь (HTTP "+response.status+")."});
+    }
 
     // =========================
     // ПЕРЕВІРКА ПОМИЛОК
@@ -132,9 +138,17 @@ async function handler(req, res, env) {
       error?.message || error
     );
 
-    return res.status(500).json({
+    const name = String(error?.name || "Error").slice(0,50);
+    const detail = String(error?.message || "").toLowerCase();
+    const kind = name === "AbortError" || name === "TimeoutError" ? "timeout" : /fetch|network|connect|certificate|tls|dns/i.test(detail) ? "network" : "unexpected";
+    return res.status(502).json({
       ok: false,
-      error: "Не вдалося зв’язатися з Новою поштою. Спробуй трохи пізніше."
+      error: kind === "timeout"
+        ? "Нова пошта не відповіла вчасно (тайм-аут)."
+        : kind === "network"
+          ? "Cloudflare не може підключитися до API Нової пошти (помилка мережі)."
+          : "Помилка обробки відповіді Нової пошти.",
+      error_type: kind
     });
   }
 }
