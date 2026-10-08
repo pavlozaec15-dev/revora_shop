@@ -42,14 +42,15 @@ async function verifyAdmin(){document.body.classList.remove('admin-allowed');log
 const money=n=>new Intl.NumberFormat('uk-UA',{style:'currency',currency:'UAH',maximumFractionDigits:0}).format(Number(n||0));
 async function loadOrderStats(){
  const notice=document.getElementById('dataNotice');
- const {data,error}=await supabase.from('orders').select('number,customer_name,total,status,created_at').order('created_at',{ascending:false}).limit(1000);
+ const {data,error}=await supabase.from('orders').select('number,customer_name,total_amount,status,created_at').order('created_at',{ascending:false}).limit(1000);
  if(error){notice.textContent='Замовлення ще не підключені: потрібно налаштувати таблицю orders у Supabase.';document.getElementById('orderRows').innerHTML='<tr><td colspan="5">Дані недоступні.</td></tr>';return;}
- const orders=data||[],revenue=orders.reduce((s,o)=>s+Number(o.total||0),0);
+ const orders=data||[],revenue=orders.reduce((s,o)=>s+Number(o.total_amount||0),0);
  document.getElementById('statRevenue').textContent=money(revenue);
  document.getElementById('statCount').textContent=String(orders.length);
  document.getElementById('statAverage').textContent=money(orders.length?revenue/orders.length:0);
  notice.textContent=orders.length===1000?'Показано лише 1000 останніх замовлень; статистика може бути неповною.':'Показано суму оформлених замовлень, а не отримані оплати. Прибуток підключимо після налаштування собівартості.';
- const row=o=>{const tr=document.createElement('tr');[o.number||'—',o.customer_name||'—',money(o.total),o.status||'—',o.created_at?new Date(o.created_at).toLocaleDateString('uk-UA'):'—'].forEach(v=>{const td=document.createElement('td');td.textContent=v;td.style.padding='12px 8px';td.style.textAlign='left';tr.append(td)});return tr};
+ const statusNames={new:'Нове',confirmed:'Підтверджено',shipped:'Відправлено',completed:'Завершено',cancelled:'Скасовано'};
+ const row=o=>{const tr=document.createElement('tr');[o.number||'—',o.customer_name||'—',money(o.total_amount),statusNames[o.status]||o.status||'—',o.created_at?new Date(o.created_at).toLocaleDateString('uk-UA'):'—'].forEach(v=>{const td=document.createElement('td');td.textContent=v;td.style.padding='12px 8px';td.style.textAlign='left';tr.append(td)});return tr};
  const tbody=document.getElementById('orderRows');tbody.replaceChildren();
  if(!orders.length)tbody.innerHTML='<tr><td colspan="5">Поки немає замовлень.</td></tr>';
  else orders.forEach(o=>tbody.append(row(o)));
