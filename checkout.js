@@ -10,6 +10,7 @@ const totals = document.querySelector("#checkoutTotals");
 const form = document.querySelector("#checkoutForm");
 
 let selectedCityRef = "";
+let novaPoshtaUnavailable = false;
 let cityTimer;
 let warehouseTimer;
 let appliedPromo = null;
@@ -299,6 +300,7 @@ cityInput.addEventListener(
               search
             });
 
+          novaPoshtaUnavailable = false;
           let addresses = [];
 
           if (Array.isArray(data)) {
@@ -385,10 +387,9 @@ cityInput.addEventListener(
 
           console.error(error);
 
+          novaPoshtaUnavailable = true;
           cityResults.innerHTML = `
-            <div class="npLoading">
-              ${String(error.message).replace(/[&<>]/g, '')}
-            </div>
+            <div class="npLoading">Автопошук тимчасово недоступний. Впиши місто вручну, а потім номер або адресу відділення. ${String(error.message).replace(/[&<>]/g, '')}</div>
           `;
         }
 
@@ -408,7 +409,7 @@ async function loadWarehouses(
 
     warehouseResults.innerHTML = `
       <div class="npLoading">
-        Спочатку виберіть місто зі списку
+        ${novaPoshtaUnavailable ? "Впиши номер або адресу відділення вручну" : "Спочатку виберіть місто зі списку"}
       </div>
     `;
 
@@ -564,10 +565,9 @@ async function loadWarehouses(
 
     console.error(error);
 
+    novaPoshtaUnavailable = true;
     warehouseResults.innerHTML = `
-      <div class="npLoading">
-        ${String(error.message).replace(/[&<>]/g, '')}
-      </div>
+      <div class="npLoading">Автопошук відділень тимчасово недоступний. Впиши номер або адресу вручну.</div>
     `;
   }
 }
@@ -706,7 +706,7 @@ form.onsubmit =
       return;
     }
 
-    if (!selectedCityRef) {
+    if (!selectedCityRef && !novaPoshtaUnavailable) {
 
       alert(
         "Будь ласка, виберіть місто Nova Poshta зі списку."
