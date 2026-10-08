@@ -759,16 +759,16 @@ form.onsubmit =
           }
         );
 
-      const result =
-        await response.json();
+      const result = await response.json().catch(() => null);
 
       if (
         !response.ok ||
-        result.ok !== true ||
-        result.stored !== true
+        result?.ok !== true ||
+        result?.stored !== true
       ) {
         throw new Error(
-          "Order send failed"
+          result?.error ||
+          `Помилка сервера (${response.status}). Спробуйте ще раз.`
         );
       }
 
@@ -836,7 +836,7 @@ form.onsubmit =
       console.error(error);
 
       alert(
-        "Не вдалося надіслати замовлення. Спробуйте ще раз."
+        error?.message || "Не вдалося надіслати замовлення. Спробуйте ще раз."
       );
 
       btn.disabled = false;
