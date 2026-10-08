@@ -111,7 +111,7 @@ ${customer.comment || "Немає"}`;
           total: Number(order.total || 0),
           status: "Прийнято"
         };
-        const dbResponse = await fetch(supabaseUrl.replace(/\\/$/, "") + "/rest/v1/orders?on_conflict=number", {
+        const dbResponse = await fetch(supabaseUrl.replace(/\/$/, "") + "/rest/v1/orders?on_conflict=number", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
