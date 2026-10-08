@@ -46,7 +46,7 @@ $('form').onsubmit=async e=>{
   const record={code:String(f.get('code')).trim().toUpperCase(),discount_type:type,amount,min_order:Number(f.get('min_order')),active:true,expires_at:expires?new Date(expires).toISOString():null};
   const {error}=await sb.from('promo_codes').insert(record);if(error)throw error;
   e.currentTarget.reset();await load();$('notice').textContent='✅ Промокод '+record.code+' створено.';
- }catch(err){$('notice').textContent='Помилка: '+err.message}finally{btn.disabled=false}
+ }catch(err){$('notice').textContent=err.code==='23505'?'Цей промокод уже створений. Знайди його нижче у списку «Мої промокоди» — ще раз створювати не потрібно.':'Помилка: '+err.message;if(err.code==='23505')await load().then(()=>{$('notice').textContent='Цей промокод уже є у списку нижче. Використай його для перевірки знижки.'})}finally{btn.disabled=false}
 };
 async function auth(){
  const {data:{user}}=await sb.auth.getUser();
