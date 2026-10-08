@@ -6,7 +6,7 @@ export async function onRequestGet({ env }) {
   try {
     const url = env.SUPABASE_URL.replace(/\/$/,'') + '/rest/v1/products?published=eq.true&select=id,name,category,description,price,old_price,sizes,image_urls,badge&order=created_at.desc&limit=300';
     const response = await fetch(url, {
-      headers: {apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY},
+      headers: {apikey: env.SUPABASE_SERVICE_ROLE_KEY, ...(env.SUPABASE_SERVICE_ROLE_KEY.startsWith('sb_secret_') ? {} : {Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY})},
       signal: AbortSignal.timeout(10000)
     });
     if (!response.ok) throw Error('Products query failed: ' + response.status);
