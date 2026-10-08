@@ -51,7 +51,7 @@ async function load(){
  const {data,error}=await sb.from('products').select('*').order('created_at',{ascending:false}).limit(300);
  if(error){$('msg').textContent='Не вдалося завантажити товари: '+error.message;return}
  items=data||[];$('count').textContent='Товари: '+items.length;
- $('msg').textContent='Збережені товари можна змінювати. Публічний каталог підключимо наступним кроком.';
+ $('msg').textContent='Опубліковані товари автоматично з’являються в магазині REVORA.';
  $('list').replaceChildren();
  if(!items.length){const p=document.createElement('p');p.textContent='Товарів ще немає. Натисни «Додати товар».';$('list').append(p)}
  items.forEach(p=>{const row=document.createElement('div');row.className='row';const img=document.createElement('img');img.className='thumb';img.alt='';if(p.image_urls?.[0])img.src=p.image_urls[0];const info=document.createElement('div');info.className='info';const b=document.createElement('b');b.textContent=p.name;const desc=document.createElement('small');desc.textContent=p.category+' · '+money(p.price)+' · '+(p.published?'Опубліковано':'Чернетка');info.append(b,desc);const edit=document.createElement('button');edit.className='btn secondary';edit.textContent='РЕДАГУВАТИ';edit.onclick=()=>openEditor(p);row.append(img,info,edit);$('list').append(row)});
@@ -77,7 +77,7 @@ $('form').onsubmit=async ev=>{
   const q=editing?sb.from('products').update(record).eq('id',editing):sb.from('products').insert(record);
   const {error}=await q.select('id').single();
   if(error)throw Error(error.message);
-  closeEditor();await load();$('msg').textContent='✅ Товар збережено у Supabase.';
+  closeEditor();await load();$('msg').textContent='✅ Товар збережено. Опубліковані товари з’являться в магазині.';
  }catch(e){message('Помилка: '+e.message)}finally{btn.disabled=false}
 };
 async function auth(){
