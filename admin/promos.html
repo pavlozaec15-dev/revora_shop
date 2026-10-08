@@ -1,0 +1,59 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>REVORA — Промокоди</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#0c0d0f;color:#f6f0e8;font:14px/1.5 system-ui,Arial}a{color:#d9b786;text-decoration:none}button,input,select{font:inherit;border:1px solid #806d4e;border-radius:7px;padding:10px 14px;background:#222226;color:white}input,select{width:100%}button{cursor:pointer}button:disabled{opacity:.5}.primary{background:#caaa79;color:#17130e;font-weight:700}header{padding:24px 5vw;border-bottom:1px solid #393632;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}header b{font:700 26px Georgia;letter-spacing:5px}main{max-width:1050px;margin:auto;padding:30px 5vw}h1{font:40px Georgia;margin:0 0 10px}p{color:#b9b3ab}.panel{border:1px solid #393532;background:#161719;padding:22px;border-radius:12px;margin:22px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}label{display:grid;gap:7px}.row{border-top:1px solid #3d3937;padding:15px 0;display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}.row small{display:block;color:#aaa}.actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}#app[hidden],#auth[hidden]{display:none}#notice{color:#e5c18c}#auth{max-width:500px;margin:11vh auto;text-align:center}@media(max-width:600px){.grid{grid-template-columns:1fr}}</style></head><body>
+<section class="panel" id="auth"><h1>REVORA ADMIN</h1><p id="authMessage">Перевіряємо доступ…</p><button id="login" class="primary" hidden>Увійти через Google →</button><p><a href="/admin/">← Адмін-панель</a></p></section>
+<div id="app" hidden><header><b>REVORA</b><nav><a href="/admin/">ПАНЕЛЬ</a> · <a href="/admin/products.html">ТОВАРИ</a> · ПРОМОКОДИ</nav><button id="logout">ВИЙТИ</button></header>
+<main><h1>Промокоди та знижки</h1><p>Створюй коди на відсоток або фіксовану суму. Знижка застосовується під час оформлення замовлення.</p>
+<section class="panel"><h2>Новий промокод</h2><form id="form"><div class="grid">
+<label>Код (латинські літери та цифри)<input name="code" required minlength="3" maxlength="30" pattern="[A-Za-z0-9_-]{3,30}" placeholder="REVORA10"></label>
+<label>Тип знижки<select name="discount_type"><option value="percent">Відсоток (%)</option><option value="fixed">Сума (грн)</option></select></label>
+<label>Розмір знижки<input name="amount" type="number" required min="0.01" max="9999999" step="0.01" placeholder="10"></label>
+<label>Мінімальна сума замовлення (грн)<input name="min_order" type="number" required min="0" max="9999999" step="0.01" value="0"></label>
+<label>Діє до (необов'язково)<input name="expires_at" type="datetime-local"></label>
+</div><p><button type="submit" class="primary" id="create">СТВОРИТИ ПРОМОКОД</button></p></form></section>
+<section class="panel"><div class="actions" style="justify-content:space-between"><h2>Мої промокоди</h2><button id="refresh">ОНОВИТИ</button></div><p id="notice" role="status"></p><div id="list"></div></section>
+</main></div><script type="module">
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const sb=createClient('https://mqsytqicykgtbjjvaroa.supabase.co','sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH',{auth:{flowType:'pkce',detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
+const $=id=>document.getElementById(id),money=n=>Number(n||0).toLocaleString('uk-UA')+' ₴';
+$('login').onclick=async()=>{const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/admin/promos.html'}});if(error)$('authMessage').textContent=error.message};
+$('logout').onclick=async()=>{await sb.auth.signOut();location.href='/admin/'};
+$('refresh').onclick=load;
+async function load(){
+ $('notice').textContent='Завантажуємо промокоди…';
+ const {data,error}=await sb.from('promo_codes').select('*').order('created_at',{ascending:false});
+ if(error){$('notice').textContent='Помилка: '+error.message;return}
+ $('notice').textContent='Промокодів: '+data.length;$('list').replaceChildren();
+ if(!data.length){$('list').textContent='Промокодів ще немає.';return}
+ for(const p of data){
+  const row=document.createElement('div');row.className='row';
+  const info=document.createElement('div');const name=document.createElement('b');name.textContent=p.code;const sub=document.createElement('small');
+  sub.textContent=(p.discount_type==='percent'?p.amount+'%':money(p.amount))+' · мінімум '+money(p.min_order)+' · '+(p.active?'АКТИВНИЙ':'ВИМКНЕНО')+(p.expires_at?' · до '+new Date(p.expires_at).toLocaleString('uk-UA'):'');
+  info.append(name,sub);
+  const actions=document.createElement('div');actions.className='actions';
+  const toggle=document.createElement('button');toggle.textContent=p.active?'ВИМКНУТИ':'УВІМКНУТИ';
+  toggle.onclick=async()=>{toggle.disabled=true;const {error}=await sb.from('promo_codes').update({active:!p.active}).eq('code',p.code);if(error){$('notice').textContent='Помилка: '+error.message;toggle.disabled=false;return}await load()};
+  const del=document.createElement('button');del.textContent='ВИДАЛИТИ';del.style.color='#ffbaba';
+  del.onclick=async()=>{if(!confirm('Назавжди видалити промокод '+p.code+'?'))return;del.disabled=true;const {error}=await sb.from('promo_codes').delete().eq('code',p.code);if(error){$('notice').textContent='Помилка: '+error.message;del.disabled=false;return}await load()};
+  actions.append(toggle,del);row.append(info,actions);$('list').append(row);
+ }
+}
+$('form').onsubmit=async e=>{
+ e.preventDefault();const btn=$('create');btn.disabled=true;$('notice').textContent='Створюємо…';
+ try{
+  const f=new FormData(e.currentTarget);const type=f.get('discount_type'),amount=Number(f.get('amount'));
+  if(type==='percent'&&amount>100)throw Error('Знижка у відсотках не може перевищувати 100%.');
+  const expires=f.get('expires_at');
+  const record={code:String(f.get('code')).trim().toUpperCase(),discount_type:type,amount,min_order:Number(f.get('min_order')),active:true,expires_at:expires?new Date(expires).toISOString():null};
+  const {error}=await sb.from('promo_codes').insert(record);if(error)throw error;
+  e.currentTarget.reset();await load();$('notice').textContent='✅ Промокод '+record.code+' створено.';
+ }catch(err){$('notice').textContent='Помилка: '+err.message}finally{btn.disabled=false}
+};
+async function auth(){
+ const {data:{user}}=await sb.auth.getUser();
+ if(!user){$('authMessage').textContent='Увійди через Google.';$('login').hidden=false;return}
+ const {data,error}=await sb.from('admin_users').select('role').eq('user_id',user.id).eq('active',true).maybeSingle();
+ if(error||!data||data.role!=='owner'){$('authMessage').textContent='Лише власник REVORA може керувати промокодами.';return}
+ $('auth').hidden=true;$('app').hidden=false;await load();
+}
+auth().catch(e=>$('authMessage').textContent='Помилка входу: '+e.message);
+</script></body></html>
