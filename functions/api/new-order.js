@@ -1,0 +1,98 @@
+import { REVORA_PRODUCTS as catalog } from '../_catalog.js';
+
+const text = (value, max, required = true) => {
+  if (typeof value !== 'string' || value.trim().length > max || (required && !value.trim())) throw new Error('Invalid customer details');
+  return value.trim();
+};
+
+async function handler(req, res, env) {
+  res.setHeader('Cache-Control', 'no-store');
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ ok: false, error: 'Method Not Allowed' });
+  }
+  let record;
+  try {
+    const order = req.body;
+    const customer = order?.customer;
+    if (!customer || !/^RV-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(order.number)) throw new Error('Invalid order number');
+    if (!Array.isArray(order.items) || !order.items.length || order.items.length > 50) throw new Error('Invalid cart');
+    const items = order.items.map(item => {
+      const product = catalog.find(p => p.id === item?.id);
+      if (!product || !product.sizes.includes(item.size) || !Number.isInteger(item.qty) || item.qty < 1 || item.qty > 20) throw new Error('Invalid cart item');
+      return { id: product.id, name: product.name, size: item.size, qty: item.qty, price: product.price };
+    });
+    if (!['branch', 'locker'].includes(customer.delivery) || customer.payment !== 'cod') throw new Error('Invalid delivery or unsupported payment');
+    const phone = text(customer.phone, 40);
+    if (!/^\+?[\d\s()-]{9,40}$/.test(phone) || phone.replace(/\D/g, '').length < 9) throw new Error('Invalid phone');
+    record = {
+      number: order.number,
+      customer_name: text([customer.name, customer.surname].filter(Boolean).join(' '), 200),
+      customer_phone: phone,
+      delivery_city: text(customer.city, 200),
+      delivery_branch: text(customer.warehouse, 500),
+      delivery_type: customer.delivery,
+      payment_method: customer.payment,
+      notes: text(customer.comment ?? '', 2000, false),
+      items,
+      total_amount: items.reduce((sum, item) => sum + item.price * item.qty, 0),
+      status: 'new'
+    };
+  } catch {
+    return res.status(400).json({ ok: false, error: 'Перевірте контактні дані, доставку та товари.' });
+  }
+  const url = env.SUPABASE_URL;
+  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return res.status(503).json({ ok: false, error: 'Збереження замовлень ще не налаштоване.' });
+  let saved;
+  let inserted = false;
+  try {
+    const headers = { 'Content-Type': 'application/json', apikey: key, Authorization: `Bearer ${key}` };
+    const endpoint = url.replace(/\/$/, '') + '/rest/v1/orders';
+    const response = await fetch(endpoint + '?on_conflict=number', {
+      method: 'POST', headers: { ...headers, Prefer: 'resolution=ignore-duplicates,return=representation' },
+      body: JSON.stringify(record), signal: AbortSignal.timeout(10000)
+    });
+    if (!response.ok) throw new Error(`Database status ${response.status}`);
+    saved = (await response.json())[0];
+    inserted = Boolean(saved);
+    // Retries return the original order without changing or notifying it again.
+    if (!saved) {
+      const existing = await fetch(endpoint + '?number=eq.' + encodeURIComponent(record.number) + '&select=number,total_amount,items', {
+        headers, signal: AbortSignal.timeout(10000)
+      });
+      if (!existing.ok) throw new Error(`Database status ${existing.status}`);
+      saved = (await existing.json())[0];
+    }
+    if (!saved) throw new Error('Order persistence not confirmed');
+  } catch (error) {
+    console.error('ORDER SAVE FAILED:', error.message);
+    return res.status(502).json({ ok: false, error: 'Не вдалося зберегти замовлення. Спробуйте ще раз.' });
+  }
+  const token = env.TELEGRAM_BOT_TOKEN;
+  const chatId = env.TELEGRAM_CHAT_ID;
+  if (inserted && token && chatId) {
+    try {
+      const message = `🛍 НОВЕ ЗАМОВЛЕННЯ REVORA\n№ ${record.number}\n\n${record.customer_name}\n${record.customer_phone}\n${record.delivery_city}, ${record.delivery_branch}\nДоставка: ${record.delivery_type === 'locker' ? 'Поштомат' : 'Відділення'}\nОплата: Післяплата\n\n${record.items.map(i => `${i.name} · ${i.size} · ${i.qty} шт. · ${i.price} грн`).join('\n')}\n\nРазом: ${record.total_amount} грн\nКоментар: ${record.notes || 'Немає'}`;
+      const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: message }), signal: AbortSignal.timeout(5000)
+      });
+      if (!response.ok || (await response.json()).ok !== true) console.error('ORDER TELEGRAM NOTIFICATION FAILED');
+    } catch { console.error('ORDER TELEGRAM NOTIFICATION FAILED'); }
+  }
+  return res.status(200).json({ ok: true, stored: true, number: saved.number, total: Number(saved.total_amount), items: saved.items });
+}
+
+export async function onRequest(context) {
+ const {request, env}=context;
+ const headers=new Headers({'Cache-Control':'no-store'});
+ const res={
+   setHeader(name,value){headers.set(name,value)},
+   status(statusCode){return {json(payload){return new Response(JSON.stringify(payload),{status:statusCode,headers:new Headers([...headers,['Content-Type','application/json; charset=utf-8']])})}}}
+ };
+ if(request.method!=='POST')return res.status(405).json({ok:false,error:'Method Not Allowed'});
+ let body;
+ try{body=await request.json()}catch{return res.status(400).json({ok:false,error:'Неправильний формат запиту.'})}
+ return handler({method:request.method,body},res,env);
+}
