@@ -33,7 +33,7 @@ async function handler(req, res, env) {
   let promoCode = '';
   let promoDiscount = 0;
   try { currentCatalog = await getOrderCatalog(env, req.body?.items); }
-  catch { return res.status(503).json({ok:false,error:'Тимчасово не вдалося перевірити товари. Спробуйте ще раз.'}); }
+  catch (error) { console.error('PRODUCT VALIDATION FAILED:', error?.message); return res.status(503).json({ok:false,error:'Не вдалося перевірити товари з Supabase. Звернися до магазину або спробуй пізніше.'}); }
   try {
     const order = req.body;
     const customer = order?.customer;
