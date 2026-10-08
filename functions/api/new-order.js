@@ -9,7 +9,7 @@ async function getOrderCatalog(env, orderedItems) {
     throw new Error('Supabase configuration is missing');
   const endpoint = env.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/products?published=eq.true&select=id,name,price,sizes&limit=500';
   const response = await fetch(endpoint, {
-    headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY },
+    headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, ...(env.SUPABASE_SERVICE_ROLE_KEY.startsWith('sb_secret_') ? {} : {Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY}) },
     signal: AbortSignal.timeout(10000)
   });
   if (!response.ok) throw new Error('Product validation unavailable: ' + response.status);
@@ -71,7 +71,7 @@ async function handler(req, res, env) {
     if (!/^[A-Z0-9_-]{3,30}$/.test(rawPromo)) return res.status(400).json({ok:false,error:'Невірний формат промокоду.'});
     try {
       const purl = url.replace(/\/$/, '') + '/rest/v1/rpc/calculate_promo_discount';
-      const pRes = await fetch(purl,{method:'POST',headers:{'Content-Type':'application/json',apikey:key,Authorization:'Bearer '+key},body:JSON.stringify({p_code:rawPromo,p_subtotal:record.total_amount}),signal:AbortSignal.timeout(10000)});
+      const pRes = await fetch(purl,{method:'POST',headers:{'Content-Type':'application/json',apikey:key,...(key.startsWith('sb_secret_') ? {} : {Authorization:'Bearer '+key})},body:JSON.stringify({p_code:rawPromo,p_subtotal:record.total_amount}),signal:AbortSignal.timeout(10000)});
       if(!pRes.ok)throw Error('Promo lookup status '+pRes.status);
       const promo = (await pRes.json())[0];
       if(!promo) {
@@ -91,7 +91,7 @@ async function handler(req, res, env) {
   let saved;
   let inserted = false;
   try {
-    const headers = { 'Content-Type': 'application/json', apikey: key, Authorization: `Bearer ${key}` };
+    const headers = { 'Content-Type': 'application/json', apikey: key, ...(key.startsWith('sb_secret_') ? {} : {Authorization: `Bearer ${key}`}) };
     const endpoint = url.replace(/\/$/, '') + '/rest/v1/orders';
     const response = await fetch(endpoint + '?on_conflict=number', {
       method: 'POST', headers: { ...headers, Prefer: 'resolution=ignore-duplicates,return=representation' },
