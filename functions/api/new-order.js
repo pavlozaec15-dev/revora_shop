@@ -70,21 +70,19 @@ async function handler(req, res, env) {
   if (rawPromo) {
     if (!/^[A-Z0-9_-]{3,30}$/.test(rawPromo)) return res.status(400).json({ok:false,error:'Невірний формат промокоду.'});
     try {
-      const purl = url.replace(/\/$/, '') + '/rest/v1/promo_codes?code=eq.' + encodeURIComponent(rawPromo) + '&select=code,discount_type,amount,min_order,active,expires_at';
-      const pRes = await fetch(purl,{headers:{apikey:key,Authorization:'Bearer '+key},signal:AbortSignal.timeout(10000)});
+      const purl = url.replace(/\/$/, '') + '/rest/v1/rpc/calculate_promo_discount';
+      const pRes = await fetch(purl,{method:'POST',headers:{'Content-Type':'application/json',apikey:key,Authorization:'Bearer '+key},body:JSON.stringify({p_code:rawPromo,p_subtotal:record.total_amount}),signal:AbortSignal.timeout(10000)});
       if(!pRes.ok)throw Error('Promo lookup status '+pRes.status);
       const promo = (await pRes.json())[0];
-      if(!promo || !promo.active || (promo.expires_at && Date.parse(promo.expires_at)<=Date.now()) || record.total_amount<Number(promo.min_order)) {
+      if(!promo) {
         return res.status(400).json({ok:false,error:'Промокод недійсний, закінчився або не підходить для цієї суми.'});
       }
       promoCode=promo.code;
-      const amount=Number(promo.amount);
-      promoDiscount=promo.discount_type==='percent'?Math.round(record.total_amount*amount)/100:amount;
-      promoDiscount=Math.min(record.total_amount,Math.max(0,Math.round(promoDiscount*100)/100));
+      promoDiscount=Number(promo.discount);
       record.subtotal_amount=record.total_amount;
       record.discount_amount=promoDiscount;
       record.promo_code=promoCode;
-      record.total_amount=Math.round((record.total_amount-promoDiscount)*100)/100;
+      record.total_amount=Number(promo.total);
     } catch(e) {
       console.error('PROMO VALIDATION ERROR:',e.message);
       return res.status(502).json({ok:false,error:'Не вдалося перевірити промокод. Спробуйте ще раз.'});
