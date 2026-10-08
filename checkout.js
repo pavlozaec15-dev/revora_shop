@@ -12,6 +12,8 @@ const form = document.querySelector("#checkoutForm");
 let selectedCityRef = "";
 let cityTimer;
 let warehouseTimer;
+let appliedPromo = null;
+
 
 /* =========================
    КОШИК
@@ -82,6 +84,12 @@ function renderCheckout() {
     0
   );
 
+  const discount = appliedPromo?.subtotal===subtotal ? appliedPromo.discount : 0;
+  if (appliedPromo && appliedPromo.subtotal !== subtotal) {
+    appliedPromo = null;
+    const msg=document.querySelector('#promoMessage');
+    if(msg)msg.textContent='Сума змінилася. Застосуй промокод ще раз.';
+  }
   totals.innerHTML = `
     <div class="sumLine">
       <span>Товари</span>
@@ -111,9 +119,10 @@ function renderCheckout() {
         : ""
     }
 
+    ${discount ? '<div class="sumLine"><span>Знижка '+appliedPromo.code+'</span><b>−'+cMoney(discount)+'</b></div>' : ''}
     <div class="sumLine grand">
       <span>Разом</span>
-      <b>${cMoney(subtotal)}</b>
+      <b>${cMoney(subtotal-discount)}</b>
     </div>
   `;
 
@@ -658,6 +667,29 @@ document.addEventListener(
   }
 );
 
+/* ПРОМОКОДИ */
+const promoInput=document.querySelector('#promoCode');
+const promoMessage=document.querySelector('#promoMessage');
+if(promoInput){
+ promoInput.addEventListener('input',()=>{
+  appliedPromo=null;promoMessage.textContent='';renderCheckout();
+ });
+ document.querySelector('#applyPromo').onclick=async()=>{
+  const code=promoInput.value.trim().toUpperCase();
+  if(!code){promoMessage.textContent='Введіть промокод.';return}
+  const subtotal=checkoutCart.reduce((sum,x)=>sum+Number(x.price)*Number(x.qty),0);
+  promoMessage.textContent='Перевіряємо…';
+  try{
+   const response=await fetch('/api/validate-promo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,subtotal})});
+   const data=await response.json();
+   if(!response.ok||!data.ok)throw Error(data.error||'Не вдалося застосувати промокод.');
+   appliedPromo={code:data.code,discount:data.discount,subtotal};
+   promoInput.value=data.code;promoMessage.textContent='✅ Промокод застосовано: −'+cMoney(data.discount);
+   renderCheckout();
+  }catch(e){appliedPromo=null;promoMessage.textContent=e.message;renderCheckout()}
+ };
+}
+
 /* =========================
    ЗАМОВЛЕННЯ
 ========================= */
@@ -735,6 +767,8 @@ form.onsubmit =
           0
         ),
 
+      promo_code: appliedPromo?.code || "",
+
       status:
         "Прийнято"
     };
@@ -773,8 +807,10 @@ form.onsubmit =
       }
 
       order.total = result.total;
+      order.discount = result.discount || 0;
       order.items = result.items;
       pendingOrderNumber = null;
+      appliedPromo = null;
 
       const orders =
         JSON.parse(
