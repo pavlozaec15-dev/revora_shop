@@ -10,7 +10,7 @@ async function handler(req, res, env) {
     const apiKey = env.NOVA_POSHTA_API_KEY;
 
     if (!apiKey) {
-      throw new Error("Nova Poshta API key is missing");
+      return res.status(503).json({ ok: false, error: "У Cloudflare не налаштований NOVA_POSHTA_API_KEY." });
     }
 
     const {
@@ -112,8 +112,8 @@ async function handler(req, res, env) {
 
       return res.status(502).json({
         ok: false,
-        error: "Nova Poshta API error",
-        details: data.errors || []
+        error: "Нова пошта відхилила запит. Перевір API-ключ або спробуй пізніше.",
+        details: Array.isArray(data.errors) ? data.errors.map(x=>String(x).slice(0,180)).slice(0,3) : []
       });
     }
 
@@ -134,7 +134,7 @@ async function handler(req, res, env) {
 
     return res.status(500).json({
       ok: false,
-      error: "Internal server error"
+      error: "Не вдалося зв’язатися з Новою поштою. Спробуй трохи пізніше."
     });
   }
 }
