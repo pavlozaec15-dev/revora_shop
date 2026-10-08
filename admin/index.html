@@ -20,7 +20,7 @@
 <section class="section" id="orders"><div class="panel"><p><a href="orders.html" class="action" style="display:inline-block;margin-bottom:18px">ВІДКРИТИ КЕРУВАННЯ ЗАМОВЛЕННЯМИ →</a></p><div class="ptop"><h2>Список замовлень</h2><span>ОЧІКУЄ ПІДКЛЮЧЕННЯ</span></div><table class="fauxTable"><thead><tr><th>Номер</th><th>Покупець</th><th>Сума</th><th>Статус</th><th>Дата</th></tr></thead><tbody id="orderRows"><tr><td colspan="5">Очікуємо дані…</td></tr></tbody></table></div></section>
 <section class="section" id="products"><div class="panel"><div class="ptop"><h2>Керування товарами</h2><span>КАТАЛОГ</span></div><div class="empty"><div class="symbol">◇</div><b>Редактор товарів REVORA</b><p>Додавайте назви, описи, ціни, розміри та фотографії у захищеній панелі.</p><a href="products.html" class="action" style="display:inline-block;margin-top:16px">ВІДКРИТИ КЕРУВАННЯ ТОВАРАМИ →</a></div></div></section>
 <section class="section" id="promos"><div class="panel"><p><a href="promos.html" class="action" style="display:inline-block;margin-bottom:18px">КЕРУВАТИ ПРОМОКОДАМИ →</a></p><div class="ptop"><h2>Акції та промокоди</h2><span>МАРКЕТИНГ</span></div><div class="empty"><div class="symbol">%</div><b>Тут будуть промокоди та банери</b><p>Термін дії, сума або відсоток знижки, ліміти використання.</p></div></div></section>
-<section class="section" id="analytics"><div class="panel"><div class="ptop"><h2>Аналітика продажів</h2><span>СТАТИСТИКА</span></div><div class="empty"><div class="symbol">▥</div><b>Аналітика ще не підключена</b><p>Виручка, прибуток, середній чек і найпопулярніші товари.</p></div></div></section>
+<section class="section" id="analytics"><div class="panel"><div class="ptop"><h2>Аналітика продажів</h2><span>СТАТИСТИКА</span></div><div class="stats"><div class="stat"><div class="k">Замовлення</div><strong id="analyticsOrders">—</strong></div><div class="stat"><div class="k">Оборот без скасованих</div><strong id="analyticsRevenue">—</strong></div><div class="stat"><div class="k">Завершені замовлення</div><strong id="analyticsCompleted">—</strong></div><div class="stat"><div class="k">Середній чек</div><strong id="analyticsAverage">—</strong></div></div><p>Показники розраховані з доступних замовлень. Прибуток потребує даних про собівартість.</p></div></section>
 <section class="section" id="team"><div class="panel"><div class="ptop"><h2>Працівники та доступ</h2><span>БЕЗПЕКА</span></div><div class="staff"><b>Ролі адміністраторів</b><p>Власник магазину, менеджер замовлень та редактор товарів. Доступ буде доступний тільки після авторизації й перевірки ролей на сервері.</p></div></div></section>
 <section class="section" id="settings"><div class="panel"><div class="ptop"><h2>Налаштування магазину</h2><span>СИСТЕМА</span></div><div class="empty"><div class="symbol">⚙</div><b>Налаштування будуть підключені пізніше</b><p>Доставка, оплата, Telegram-сповіщення та права доступу.</p></div></div></section>
 </main></div>
@@ -56,6 +56,10 @@ async function loadOrderStats(){
  const completed=orders.filter(o=>o.status==='completed');
  const completedTotal=completed.reduce((s,o)=>s+Number(o.total_amount||0),0);
  document.getElementById('statSales').textContent=String(completed.length);
+ document.getElementById('analyticsOrders').textContent=String(orders.length);
+ document.getElementById('analyticsRevenue').textContent=money(revenue);
+ document.getElementById('analyticsCompleted').textContent=String(completed.length);
+ document.getElementById('analyticsAverage').textContent=money(orders.filter(o=>o.status!=='cancelled').length?revenue/orders.filter(o=>o.status!=='cancelled').length:0);
  document.getElementById('statPaid').textContent=money(completedTotal);
  document.getElementById('statProducts').textContent=productError?'—':String(productCount??0);
  document.getElementById('publishedProducts').textContent=productError||publishedError?'Не вдалося отримати товари':'Опубліковано: '+publishedCount;
