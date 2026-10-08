@@ -230,7 +230,8 @@ async function novaRequest(payload) {
     );
 
     throw new Error(
-      "Nova Poshta request failed"
+      [result?.error, ...(Array.isArray(result?.details) ? result.details : [])].filter(Boolean).join(' ') ||
+      'Помилка підключення до Нової пошти.'
     );
   }
 
@@ -386,7 +387,7 @@ cityInput.addEventListener(
 
           cityResults.innerHTML = `
             <div class="npLoading">
-              Помилка завантаження міст
+              ${String(error.message).replace(/[&<>]/g, '')}
             </div>
           `;
         }
@@ -565,7 +566,7 @@ async function loadWarehouses(
 
     warehouseResults.innerHTML = `
       <div class="npLoading">
-        Помилка завантаження відділень
+        ${String(error.message).replace(/[&<>]/g, '')}
       </div>
     `;
   }
