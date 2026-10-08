@@ -5,7 +5,7 @@
 <div id="auth"><h1>REVORA ADMIN</h1><p id="authText">Перевіряємо права доступу…</p><button class="btn" id="login" hidden>Увійти через Google →</button><p><a href="/admin/">← Адмін-панель</a></p></div>
 <div id="app" hidden><header><strong>REVORA</strong><nav><a href="/admin/">← ПАНЕЛЬ</a> &nbsp; / &nbsp; ТОВАРИ</nav><button class="btn secondary" id="logout">ВИЙТИ</button></header>
 <main class="wrap"><div class="tag">REVORA · КАТАЛОГ</div><h1>Керування товарами</h1><p>Фото, ціна, розміри, опис і публікація. Дані зберігаються в Supabase.</p>
-<section class="panel"><div class="bar"><b id="count">Товари</b><div><button class="btn" id="newBtn">+ ДОДАТИ ТОВАР</button> <button class="btn secondary" id="refresh">ОНОВИТИ</button></div></div><p id="msg"></p><div id="list"></div></section>
+<section class="panel"><div class="bar"><b id="count">Товари</b><div><button class="btn" id="newBtn">+ ДОДАТИ ТОВАР</button> <button class="btn secondary" id="refresh">ОНОВИТИ</button></div></div><p id="msg"></p><label for="productSearch">Пошук товарів<input id="productSearch" type="search" placeholder="Назва або категорія…" autocomplete="off"></label><label for="productFilter">Статус<select id="productFilter"><option value="all">Усі товари</option><option value="published">Опубліковані</option><option value="draft">Чернетки</option></select></label><div id="list"></div></section>
 <section class="panel" id="editor" hidden><div class="bar"><h2 id="editorTitle">Новий товар</h2><button class="btn secondary" id="closeEditor">ЗАКРИТИ ×</button></div>
 <form id="form"><div class="grid">
 <label>Назва *<input name="name" required minlength="2" maxlength="180"></label>
@@ -25,6 +25,8 @@ import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2
 const sb=createClient('https://mqsytqicykgtbjjvaroa.supabase.co','sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH',{auth:{flowType:'pkce',detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
 const $=id=>document.getElementById(id),money=n=>Number(n).toLocaleString('uk-UA')+' ₴';
 let owner=false,items=[],editing=null,photos=[];
+$('productSearch').addEventListener('input',renderList);
+$('productFilter').addEventListener('change',renderList);
 $('login').onclick=async()=>{await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/admin/products.html'}})};
 $('logout').onclick=async()=>{await sb.auth.signOut();location.href='/admin/'};
 function message(s){$('status').textContent=s}
@@ -52,9 +54,15 @@ async function load(){
  if(error){$('msg').textContent='Не вдалося завантажити товари: '+error.message;return}
  items=data||[];$('count').textContent='Товари: '+items.length;
  $('msg').textContent='Опубліковані товари автоматично з’являються в магазині REVORA.';
+ renderList();
+}
+function renderList(){
+ const search=$('productSearch').value.trim().toLocaleLowerCase('uk-UA');
+ const filter=$('productFilter').value;
+ const visible=items.filter(p=>(filter==='all'||(filter==='published'===Boolean(p.published)))&&(!search||(p.name+' '+p.category).toLocaleLowerCase('uk-UA').includes(search)));
  $('list').replaceChildren();
- if(!items.length){const p=document.createElement('p');p.textContent='Товарів ще немає. Натисни «Додати товар».';$('list').append(p)}
- items.forEach(p=>{const row=document.createElement('div');row.className='row';const img=document.createElement('img');img.className='thumb';img.alt='';if(p.image_urls?.[0])img.src=p.image_urls[0];const info=document.createElement('div');info.className='info';const b=document.createElement('b');b.textContent=p.name;const desc=document.createElement('small');desc.textContent=p.category+' · '+money(p.price)+' · '+(p.published?'Опубліковано':'Чернетка');info.append(b,desc);const edit=document.createElement('button');edit.className='btn secondary';edit.textContent='РЕДАГУВАТИ';edit.onclick=()=>openEditor(p);const del=document.createElement('button');del.className='btn secondary';del.textContent='ВИДАЛИТИ';del.style.borderColor='#9c4545';del.style.color='#ffb5b5';del.onclick=async()=>{if(!owner)return;if(!confirm('Видалити товар «'+p.name+'»? Його більше не буде в магазині. Цю дію неможливо скасувати.'))return;del.disabled=true;del.textContent='ВИДАЛЯЄМО…';try{const {data,error}=await sb.from('products').delete().eq('id',p.id).select('id');if(error)throw error;if(!data?.length)throw Error('Немає дозволу видалити цей товар або його вже видалено.');if(editing===p.id)closeEditor();await load();$('msg').textContent='✅ Товар «'+p.name+'» видалено.';}catch(e){$('msg').textContent='Помилка видалення: '+e.message;del.disabled=false;del.textContent='ВИДАЛИТИ';}};row.append(img,info,edit,del);$('list').append(row)});
+ if(!visible.length){const p=document.createElement('p');p.textContent='Товарів ще немає. Натисни «Додати товар».';$('list').append(p)}
+ visible.forEach(p=>{const row=document.createElement('div');row.className='row';const img=document.createElement('img');img.className='thumb';img.alt='';if(p.image_urls?.[0])img.src=p.image_urls[0];const info=document.createElement('div');info.className='info';const b=document.createElement('b');b.textContent=p.name;const desc=document.createElement('small');desc.textContent=p.category+' · '+money(p.price)+' · '+(p.published?'Опубліковано':'Чернетка');info.append(b,desc);const edit=document.createElement('button');edit.className='btn secondary';edit.textContent='РЕДАГУВАТИ';edit.onclick=()=>openEditor(p);const del=document.createElement('button');del.className='btn secondary';del.textContent='ВИДАЛИТИ';del.style.borderColor='#9c4545';del.style.color='#ffb5b5';del.onclick=async()=>{if(!owner)return;if(!confirm('Видалити товар «'+p.name+'»? Його більше не буде в магазині. Цю дію неможливо скасувати.'))return;del.disabled=true;del.textContent='ВИДАЛЯЄМО…';try{const {data,error}=await sb.from('products').delete().eq('id',p.id).select('id');if(error)throw error;if(!data?.length)throw Error('Немає дозволу видалити цей товар або його вже видалено.');if(editing===p.id)closeEditor();await load();$('msg').textContent='✅ Товар «'+p.name+'» видалено.';}catch(e){$('msg').textContent='Помилка видалення: '+e.message;del.disabled=false;del.textContent='ВИДАЛИТИ';}};row.append(img,info,edit,del);$('list').append(row)});
 }
 $('form').onsubmit=async ev=>{
  ev.preventDefault();if(!owner)return;
