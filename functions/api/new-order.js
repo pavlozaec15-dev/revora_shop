@@ -1,16 +1,20 @@
 import { REVORA_PRODUCTS as catalog } from '../_catalog.js';
 
-async function getOrderCatalog(env) {
+async function getOrderCatalog(env, orderedItems) {
+  const selected = orderedItems || [];
   const staticItems = catalog;
-  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return staticItems;
+  const needsDynamic = selected.some(item => !staticItems.some(p => p.id === item?.id));
+  if (!needsDynamic) return staticItems;
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY)
+    throw new Error('Supabase configuration is missing');
   const endpoint = env.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/products?published=eq.true&select=id,name,price,sizes&limit=500';
   const response = await fetch(endpoint, {
     headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY },
     signal: AbortSignal.timeout(10000)
   });
-  if (!response.ok) throw new Error('Product validation unavailable: '+response.status);
+  if (!response.ok) throw new Error('Product validation unavailable: ' + response.status);
   const active = await response.json();
-  return [...staticItems, ...active.map(x=>({id:x.id,name:x.name,price:Number(x.price),sizes:x.sizes||[]}))];
+  return [...staticItems, ...active.map(x => ({ id:x.id, name:x.name, price:Number(x.price), sizes:x.sizes||[] }))];
 }
 
 const text = (value, max, required = true) => {
@@ -28,7 +32,7 @@ async function handler(req, res, env) {
   let currentCatalog;
   let promoCode = '';
   let promoDiscount = 0;
-  try { currentCatalog = await getOrderCatalog(env); }
+  try { currentCatalog = await getOrderCatalog(env, req.body?.items); }
   catch { return res.status(503).json({ok:false,error:'Тимчасово не вдалося перевірити товари. Спробуйте ще раз.'}); }
   try {
     const order = req.body;
