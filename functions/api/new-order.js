@@ -9,7 +9,7 @@ async function getOrderCatalog(env, orderedItems) {
     throw new Error('Supabase configuration is missing');
   const endpoint = env.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/products?published=eq.true&select=id,name,price,sizes&limit=500';
   const response = await fetch(endpoint, {
-    headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, ...(env.SUPABASE_SERVICE_ROLE_KEY.startsWith('sb_secret_') ? {} : {Authorization: 'Bearer ' + env.SUPABASE_SERVICE_ROLE_KEY}) },
+    headers: { apikey: 'sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH' },
     signal: AbortSignal.timeout(10000)
   });
   if (!response.ok) throw new Error('Product validation unavailable: ' + response.status);
