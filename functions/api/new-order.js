@@ -26,6 +26,8 @@ async function handler(req, res, env) {
   }
   let record;
   let currentCatalog;
+  let promoCode = '';
+  let promoDiscount = 0;
   try { currentCatalog = await getOrderCatalog(env); }
   catch { return res.status(503).json({ok:false,error:'Тимчасово не вдалося перевірити товари. Спробуйте ще раз.'}); }
   try {
@@ -60,6 +62,30 @@ async function handler(req, res, env) {
   const url = env.SUPABASE_URL;
   const key = env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return res.status(503).json({ ok: false, error: !url ? 'Cloudflare: відсутня змінна SUPABASE_URL.' : 'Cloudflare: відсутня змінна SUPABASE_SERVICE_ROLE_KEY.' });
+  const rawPromo = String(req.body?.promo_code || '').trim().toUpperCase();
+  if (rawPromo) {
+    if (!/^[A-Z0-9_-]{3,30}$/.test(rawPromo)) return res.status(400).json({ok:false,error:'Невірний формат промокоду.'});
+    try {
+      const purl = url.replace(/\/$/, '') + '/rest/v1/promo_codes?code=eq.' + encodeURIComponent(rawPromo) + '&select=code,discount_type,amount,min_order,active,expires_at';
+      const pRes = await fetch(purl,{headers:{apikey:key,Authorization:'Bearer '+key},signal:AbortSignal.timeout(10000)});
+      if(!pRes.ok)throw Error('Promo lookup status '+pRes.status);
+      const promo = (await pRes.json())[0];
+      if(!promo || !promo.active || (promo.expires_at && Date.parse(promo.expires_at)<=Date.now()) || record.total_amount<Number(promo.min_order)) {
+        return res.status(400).json({ok:false,error:'Промокод недійсний, закінчився або не підходить для цієї суми.'});
+      }
+      promoCode=promo.code;
+      const amount=Number(promo.amount);
+      promoDiscount=promo.discount_type==='percent'?Math.round(record.total_amount*amount)/100:amount;
+      promoDiscount=Math.min(record.total_amount,Math.max(0,Math.round(promoDiscount*100)/100));
+      record.subtotal_amount=record.total_amount;
+      record.discount_amount=promoDiscount;
+      record.promo_code=promoCode;
+      record.total_amount=Math.round((record.total_amount-promoDiscount)*100)/100;
+    } catch(e) {
+      console.error('PROMO VALIDATION ERROR:',e.message);
+      return res.status(502).json({ok:false,error:'Не вдалося перевірити промокод. Спробуйте ще раз.'});
+    }
+  }
   let saved;
   let inserted = false;
   try {
@@ -89,7 +115,7 @@ async function handler(req, res, env) {
   const chatId = env.TELEGRAM_CHAT_ID;
   if (inserted && token && chatId) {
     try {
-      const message = `🛍 НОВЕ ЗАМОВЛЕННЯ REVORA\n№ ${record.number}\n\n${record.customer_name}\n${record.customer_phone}\n${record.delivery_city}, ${record.delivery_branch}\nДоставка: ${record.delivery_type === 'locker' ? 'Поштомат' : 'Відділення'}\nОплата: Післяплата\n\n${record.items.map(i => `${i.name} · ${i.size} · ${i.qty} шт. · ${i.price} грн`).join('\n')}\n\nРазом: ${record.total_amount} грн\nКоментар: ${record.notes || 'Немає'}`;
+      const message = `🛍 НОВЕ ЗАМОВЛЕННЯ REVORA\n№ ${record.number}\n\n${record.customer_name}\n${record.customer_phone}\n${record.delivery_city}, ${record.delivery_branch}\nДоставка: ${record.delivery_type === 'locker' ? 'Поштомат' : 'Відділення'}\nОплата: Післяплата\n\n${record.items.map(i => `${i.name} · ${i.size} · ${i.qty} шт. · ${i.price} грн`).join('\n')}\n\nРазом: ${record.total_amount} грн${promoCode ? `\nПромокод: ${promoCode} (−${promoDiscount} грн)` : ''}\nКоментар: ${record.notes || 'Немає'}`;
       const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text: message }), signal: AbortSignal.timeout(5000)
@@ -97,7 +123,7 @@ async function handler(req, res, env) {
       if (!response.ok || (await response.json()).ok !== true) console.error('ORDER TELEGRAM NOTIFICATION FAILED');
     } catch { console.error('ORDER TELEGRAM NOTIFICATION FAILED'); }
   }
-  return res.status(200).json({ ok: true, stored: true, number: saved.number, total: Number(saved.total_amount), items: saved.items });
+  return res.status(200).json({ ok: true, stored: true, number: saved.number, total: Number(saved.total_amount), discount: promoDiscount, promo_code: promoCode, items: saved.items });
 }
 
 export async function onRequest(context) {
