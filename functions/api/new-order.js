@@ -129,7 +129,7 @@ async function handler(req, res, env) {
   }
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
-  if (inserted && token && chatId) {
+  if (inserted && token && chatId && storeSettings.telegram_enabled==='true') {
     try {
       const message = `🛍 НОВЕ ЗАМОВЛЕННЯ REVORA\n№ ${record.number}\n\n${record.customer_name}\n${record.customer_phone}\n${record.delivery_city}, ${record.delivery_branch}\nДоставка: ${record.delivery_type === 'locker' ? 'Поштомат' : 'Відділення'}\nОплата: Післяплата\n\n${record.items.map(i => `${i.name} · ${i.size} · ${i.qty} шт. · ${i.price} грн`).join('\n')}\n\nРазом: ${record.total_amount} грн${promoCode ? `\nПромокод: ${promoCode} (−${promoDiscount} грн)` : ''}\nКоментар: ${record.notes || 'Немає'}`;
       const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
