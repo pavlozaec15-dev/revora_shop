@@ -53,6 +53,9 @@ body{background:radial-gradient(ellipse at 85% -15%,#242018 0%,transparent 43%),
 @media(max-width:850px){#dashboard>.stats:nth-child(3){grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){#dashboard>.stats:nth-child(3){grid-template-columns:1fr}#dashboard .mainGrid .ptop h2{font-size:19px}}
 @media(prefers-reduced-motion:reduce){.stat,.action,.nav button,.quickProductLink{transition:none!important;transform:none!important}}
+
+/* Compact, balanced sidebar icons */
+.nav .ico{font-size:13px;width:20px;height:20px;flex:0 0 20px;line-height:1;display:inline-flex;align-items:center;justify-content:center;font-weight:500}.nav button{gap:10px;align-items:center}.nav button .ico{transform:none}
 </style></head><body>
 <section class="authGate" id="authGate"><div class="authPanel"><div class="brand">REVORA<small>SECURE ADMIN</small></div><h1>Вхід для команди</h1><p>Увійдіть через Google. Адмін-панель доступна лише користувачам, яких додав власник магазину.</p><button id="googleLogin" class="authButton" type="button">Увійти через Google →</button><p id="authMessage" class="authMessage" role="status">Перевіряємо доступ…</p></div></section>
 <div class="layout"><aside class="sidebar" id="sidebar"><div><a href="../index.html" class="brand">REVORA<small>CONTROL CENTER</small></a></div><div class="navlabel">Керування</div><div class="nav" id="nav">
