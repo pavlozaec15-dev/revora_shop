@@ -179,7 +179,7 @@ document.getElementById('staffForm').addEventListener('submit',async event=>{
  event.preventDefault();if(currentAdminRole!=='owner')return;
  const btn=document.getElementById('staffAdd');btn.disabled=true;staffNotice.textContent='Додаємо працівника…';
  const email=document.getElementById('staffUserId').value.trim(),role=document.getElementById('staffRole').value;
- try{const result=await staffApi({action:'invite',email,role});staffNotice.textContent=result.message;document.getElementById('staffForm').reset();await loadInvites();}
+ try{const result=await staffApi({action:'invite',email,role});staffNotice.textContent=result.message;if(result.inviteUrl){const link=document.createElement('a');link.href=result.inviteUrl;link.textContent='ВІДКРИТИ ПОСИЛАННЯ ЗАПРОШЕННЯ';link.target='_blank';link.rel='noopener noreferrer';link.style.cssText='display:block;margin-top:10px;color:#e9d5b7;overflow-wrap:anywhere';const copy=document.createElement('button');copy.type='button';copy.textContent='КОПІЮВАТИ ПОСИЛАННЯ';copy.style.cssText='display:block;margin-top:10px;padding:9px 14px';copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(result.inviteUrl);copy.textContent='СКОПІЙОВАНО'}catch{window.prompt('Скопіюйте посилання:',result.inviteUrl)}});staffNotice.append(link,copy)}document.getElementById('staffForm').reset();await loadInvites();}
  catch(e){staffNotice.textContent='Помилка: '+e.message}
  finally{btn.disabled=false;}
 });
