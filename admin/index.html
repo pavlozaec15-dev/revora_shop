@@ -53,7 +53,7 @@ body{background:radial-gradient(ellipse at 85% -15%,#242018 0%,transparent 43%),
 <section class="section" id="products"><div class="panel"><div class="ptop"><h2>Керування товарами</h2><span>КАТАЛОГ</span></div><div class="empty"><div class="symbol">◇</div><b>Редактор товарів REVORA</b><p>Додавайте назви, описи, ціни, розміри та фотографії у захищеній панелі.</p><a href="products.html" class="action" style="display:inline-block;margin-top:16px">ВІДКРИТИ КЕРУВАННЯ ТОВАРАМИ →</a></div></div></section>
 <section class="section" id="promos"><div class="panel"><p><a href="promos.html" class="action" style="display:inline-block;margin-bottom:18px">КЕРУВАТИ ПРОМОКОДАМИ →</a></p><div class="ptop"><h2>Акції та промокоди</h2><span>МАРКЕТИНГ</span></div><div class="empty"><div class="symbol">%</div><b>Тут будуть промокоди та банери</b><p>Термін дії, сума або відсоток знижки, ліміти використання.</p></div></div></section>
 <section class="section" id="analytics"><div class="panel"><div class="ptop"><h2>Аналітика продажів</h2><button type="button" class="action" id="analyticsRefresh">ОНОВИТИ ДАНІ</button></div><p id="analyticsNotice" role="status">Завантаження аналітики…</p><div class="stats"><div class="stat"><div class="k">Усього замовлень</div><strong id="analyticsOrders">—</strong></div><div class="stat"><div class="k">Оборот без скасованих</div><strong id="analyticsRevenue">—</strong></div><div class="stat"><div class="k">Завершені замовлення</div><strong id="analyticsCompleted">—</strong></div><div class="stat"><div class="k">Середній чек без скасованих</div><strong id="analyticsAverage">—</strong></div><div class="stat"><div class="k">Скасовані замовлення</div><strong id="analyticsCancelled">—</strong></div><div class="stat"><div class="k">Сума завершених замовлень</div><strong id="analyticsCompletedRevenue">—</strong></div></div><h2>Найпопулярніші товари</h2><div id="analyticsTopProducts">Завантаження…</div><p>Оборот — сума замовлень, а не підтверджена оплата чи чистий прибуток. Популярність товарів рахується за кількістю одиниць у нескасованих замовленнях.</p></div></section>
-<section class="section" id="team"><div class="panel"><div class="ptop"><h2>Команда REVORA</h2><button class="action" type="button" id="staffRefresh">ОНОВИТИ</button></div><p id="staffNotice" role="status">Завантаження працівників…</p><div class="staffIntro"><div><b>♛ Власник</b><small>Керує доступами команди</small></div><div><b>▣ Менеджер</b><small>Робота із замовленнями</small></div><div><b>◇ Редактор</b><small>Робота з каталогом</small></div></div><div id="staffOwnerOnly" hidden><h2 class="staffHeading">Додати працівника</h2><p class="staffHint">Співробітник має спочатку увійти через Google у REVORA. Вкажіть його Supabase User ID (UUID). Додавати власників через цю форму заборонено.</p><form id="staffForm" class="staffForm"><label>Ідентифікатор користувача<input id="staffUserId" required placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" pattern="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"></label><label>Роль<select id="staffRole"><option value="manager">Менеджер</option><option value="editor">Редактор товарів</option></select></label><button class="action" type="submit" id="staffAdd">ДОДАТИ ДО КОМАНДИ</button></form><h2 class="staffHeading">Працівники</h2><div id="staffList" class="staffList">Завантаження…</div></div><div id="staffRestricted" class="staff" hidden>Керувати доступами може тільки власник магазину.</div></div></section>
+<section class="section" id="team"><div class="panel"><div class="ptop"><h2>Команда REVORA</h2><button class="action" type="button" id="staffRefresh">ОНОВИТИ</button></div><p id="staffNotice" role="status">Завантаження працівників…</p><div class="staffIntro"><div><b>♛ Власник</b><small>Керує доступами команди</small></div><div><b>▣ Менеджер</b><small>Робота із замовленнями</small></div><div><b>◇ Редактор</b><small>Робота з каталогом</small></div></div><div id="staffOwnerOnly" hidden><h2 class="staffHeading">Додати працівника</h2><p class="staffHint">Вкажіть Gmail працівника. Йому буде надіслано запрошення, яке потрібно підтвердити перед отриманням доступу.</p><form id="staffForm" class="staffForm"><label>Gmail працівника<input id="staffUserId" type="email" required placeholder="employee@gmail.com" autocomplete="off"></label><label>Роль<select id="staffRole"><option value="manager">Менеджер</option><option value="editor">Редактор товарів</option></select></label><button class="action" type="submit" id="staffAdd">НАДІСЛАТИ ЗАПРОШЕННЯ</button></form><h2 class="staffHeading">Працівники</h2><div id="staffList" class="staffList">Завантаження…</div><h2 class="staffHeading">Запрошення</h2><div id="staffInvites" class="staffList">Завантаження…</div></div><div id="staffRestricted" class="staff" hidden>Керувати доступами може тільки власник магазину.</div></div></section>
 <section class="section" id="settings"><div class="panel"><div class="ptop"><h2>Налаштування магазину</h2><span>СИСТЕМА</span></div><div class="empty"><div class="symbol">⚙</div><b>Налаштування будуть підключені пізніше</b><p>Доставка, оплата, Telegram-сповіщення та права доступу.</p></div></div></section>
 </main></div>
 <script>
@@ -69,7 +69,7 @@ const login=document.getElementById('googleLogin');
 const say=(txt)=>{message.textContent=txt};
 login.addEventListener('click',async()=>{login.disabled=true;say('Перенаправляємо до Google…');try{const {error}=await supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/admin/'}});if(error)throw error}catch(e){say('Помилка Google-входу: '+(e.message||'Спробуйте ще раз'));login.disabled=false}});
 document.getElementById('logoutBtn').addEventListener('click',async()=>{document.body.classList.remove('admin-allowed');await supabase.auth.signOut();login.disabled=false;say('Ви вийшли з адмін-панелі.')});
-async function verifyAdmin(){document.body.classList.remove('admin-allowed');login.disabled=false;const {data:{user},error}=await supabase.auth.getUser();if(error||!user){say(error?'Не вдалося перевірити сесію. Спробуйте ввійти.':'Увійдіть через Google, щоб продовжити.');return;}login.style.display='none';say('Перевіряємо права доступу…');const {data, error:roleError}=await supabase.from('admin_users').select('role').eq('user_id',user.id).eq('active',true).maybeSingle();if(roleError){say('Вхід підтверджено, але список адміністраторів ще не налаштований. Доступ закритий.');return;}if(!data||!['owner','manager','editor'].includes(data.role)){say('Ваш Google-акаунт не має прав адміністратора REVORA. Зверніться до власника магазину.');return;}document.body.classList.add('admin-allowed');currentAdminRole=data.role;currentAdminId=user.id;await loadOrderStats();await loadStaff();}
+async function verifyAdmin(){document.body.classList.remove('admin-allowed');login.disabled=false;const {data:{user},error}=await supabase.auth.getUser();if(error||!user){say(error?'Не вдалося перевірити сесію. Спробуйте ввійти.':'Увійдіть через Google, щоб продовжити.');return;}login.style.display='none';say('Перевіряємо права доступу…');const {data, error:roleError}=await supabase.from('admin_users').select('role').eq('user_id',user.id).eq('active',true).maybeSingle();if(roleError){say('Вхід підтверджено, але список адміністраторів ще не налаштований. Доступ закритий.');return;}if(!data||!['owner','manager','editor'].includes(data.role)){const invite=new URLSearchParams(location.search).get('invite');if(invite){try{const result=await staffApi({action:'accept',token:invite});history.replaceState(null,'',location.pathname);say(result.message);return verifyAdmin()}catch(e){say('Не вдалося підтвердити запрошення: '+e.message);return}}say('Ваш Google-акаунт не має прав адміністратора REVORA. Зверніться до власника магазину.');return;}document.body.classList.add('admin-allowed');if(new URLSearchParams(location.search).has('invite'))history.replaceState(null,'',location.pathname);currentAdminRole=data.role;currentAdminId=user.id;await loadOrderStats();await loadStaff();}
 
 const money=n=>new Intl.NumberFormat('uk-UA',{style:'currency',currency:'UAH',maximumFractionDigits:0}).format(Number(n||0));
 async function loadOrderStats(){
@@ -126,6 +126,27 @@ let currentAdminRole=null,currentAdminId=null;
 const staffNotice=document.getElementById('staffNotice');
 const staffList=document.getElementById('staffList');
 const roleLabels={owner:'Власник',manager:'Менеджер',editor:'Редактор товарів'};
+async function staffApi(body){
+ const {data:{session}}=await supabase.auth.getSession();
+ if(!session)throw Error('Потрібен вхід через Google');
+ const response=await fetch('https://mqsytqicykgtbjjvaroa.supabase.co/functions/v1/revora-staff-invites',{method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH','Authorization':'Bearer '+session.access_token},body:JSON.stringify(body)});
+ const result=await response.json();if(!response.ok)throw Error(result.error||'Помилка запрошення');return result;
+}
+async function loadInvites(){
+ const holder=document.getElementById('staffInvites');holder.replaceChildren();
+ try{
+  const result=await staffApi({action:'list'});
+  if(!result.invitations.length){holder.textContent='Запрошень поки немає.';return;}
+  result.invitations.forEach(inv=>{
+   const row=document.createElement('div');row.className='staffRow';
+   const info=document.createElement('div');const title=document.createElement('strong');title.textContent=inv.email;
+   const detail=document.createElement('small');detail.textContent=(roleLabels[inv.role]||inv.role)+' · '+(inv.accepted_at?'Підтверджено':inv.revoked_at?'Скасовано':new Date(inv.expires_at)<new Date()?'Термін минув':'Очікує підтвердження');
+   info.append(title,detail);row.append(info);
+   if(!inv.accepted_at&&!inv.revoked_at){const cancel=document.createElement('button');cancel.textContent='Скасувати';cancel.className='logout';cancel.addEventListener('click',async()=>{cancel.disabled=true;try{await staffApi({action:'revoke',id:inv.id});await loadInvites()}catch(e){staffNotice.textContent=e.message;cancel.disabled=false}});row.append(cancel)}
+   holder.append(row);
+  });
+ }catch(e){holder.textContent='Не вдалося отримати запрошення: '+e.message}
+}
 async function loadStaff(){
  const owner=currentAdminRole==='owner';
  document.getElementById('staffOwnerOnly').hidden=!owner;
@@ -136,7 +157,7 @@ async function loadStaff(){
  if(error){staffNotice.textContent='Не вдалося завантажити працівників: '+error.message;return;}
  staffNotice.textContent='У команді: '+data.length+'. Активних: '+data.filter(x=>x.active).length+'.';
  staffList.replaceChildren();
- if(!data.length){staffList.textContent='Працівників ще немає.';return;}
+ if(!data.length){staffList.textContent='Працівників ще немає.';await loadInvites();return;}
  data.forEach(member=>{
   const row=document.createElement('div');row.className='staffRow'+(member.role==='owner'?' owner':'');
   const info=document.createElement('div');const name=document.createElement('strong');name.textContent=(roleLabels[member.role]||member.role)+(member.active?' · Активний':' · Вимкнений');const id=document.createElement('small');id.textContent=member.user_id;info.append(name,id);row.append(info);
@@ -151,15 +172,16 @@ async function loadStaff(){
   }
   row.append(actions);staffList.append(row);
  });
+ await loadInvites();
 }
 document.getElementById('staffRefresh').addEventListener('click',()=>loadStaff());
 document.getElementById('staffForm').addEventListener('submit',async event=>{
  event.preventDefault();if(currentAdminRole!=='owner')return;
  const btn=document.getElementById('staffAdd');btn.disabled=true;staffNotice.textContent='Додаємо працівника…';
- const user_id=document.getElementById('staffUserId').value.trim().toLowerCase(),role=document.getElementById('staffRole').value;
- const {error}=await supabase.from('admin_users').insert({user_id,role,active:true});
- btn.disabled=false;if(error){staffNotice.textContent='Не вдалося додати: '+error.message;return;}
- document.getElementById('staffForm').reset();await loadStaff();
+ const email=document.getElementById('staffUserId').value.trim(),role=document.getElementById('staffRole').value;
+ try{const result=await staffApi({action:'invite',email,role});staffNotice.textContent=result.message;document.getElementById('staffForm').reset();await loadInvites();}
+ catch(e){staffNotice.textContent='Помилка: '+e.message}
+ finally{btn.disabled=false;}
 });
 
 document.getElementById('analyticsRefresh').addEventListener('click',()=>loadOrderStats().catch(e=>document.getElementById('analyticsNotice').textContent='Помилка: '+e.message));
