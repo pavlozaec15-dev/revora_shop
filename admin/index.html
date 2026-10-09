@@ -132,6 +132,9 @@ async function loadOrderStats(){
   monthly.replaceChildren();
   const days=Array.from({length:30},(_,i)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-(29-i));return d});
   const amounts=days.map(d=>orders.filter(o=>o.status!=='cancelled'&&o.created_at&&new Date(o.created_at).toDateString()===d.toDateString()).reduce((s,o)=>s+Number(o.total_amount||0),0));
+  const sum=amounts.reduce((s,n)=>s+n,0);
+  const summary=document.getElementById('analyticsMonthlySummary');
+  if(summary)summary.textContent='Оборот за 30 днів: '+money(sum)+' · Замовлень за період: '+orders.filter(o=>o.created_at&&new Date(o.created_at)>=days[0]).length+(sum===0?' · За цей період немає обороту.':'');
   const max=Math.max(1,...amounts);
   days.forEach((day,i)=>{
    const col=document.createElement('div');col.style.cssText='flex:1;min-width:12px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:end;gap:6px';
