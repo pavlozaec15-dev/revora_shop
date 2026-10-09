@@ -52,6 +52,7 @@ $('deleteOrder').onclick=async()=>{
  }catch(e){$('notice').textContent='Помилка видалення: '+e.message}
  finally{button.disabled=false}
 };
+$('saveDelivery').onclick=async()=>{if(!selected)return;const b=$('saveDelivery');b.disabled=true;try{const {error}=await sb.from('orders').update({tracking_number:$('tracking').value.trim(),manager_note:$('managerNote').value.trim()}).eq('id',selected.id);if(error)throw error;await load();$('notice').textContent='ТТН і коментар збережено';}catch(e){$('notice').textContent='Помилка: '+e.message}finally{b.disabled=false}};
 $('save').onclick=async()=>{
 if(!selected)return;const button=$('save');button.disabled=true;$('notice').textContent='Зберігаємо…';
 try{const {data,error}=await sb.from('orders').update({status:$('status').value}).eq('id',selected.id).select('id,status').single();if(error)throw error;if(!data)throw Error('Немає прав або замовлення не знайдено');selected.status=data.status;await load();$('notice').textContent='✅ Статус збережено: '+names[data.status]}catch(e){$('notice').textContent='Помилка: '+e.message}finally{button.disabled=false}
