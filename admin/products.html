@@ -11,7 +11,7 @@
 <label>Назва *<input name="name" required minlength="2" maxlength="180"></label>
 <label>Категорія *<select name="category" required><option value="">Обери категорію</option><option>Пуховики</option><option>Худі</option><option>Куртки</option><option>Шорти</option><option>Футболки</option><option>Штани</option><option>Кросівки</option><option>Аксесуари</option><option>Світшоти</option><option>Жилети</option><option>Сумки</option><option>Головні убори</option></select></label>
 <label>Ціна, грн *<input type="number" name="price" required min="0" max="9999999" step="1"></label>
-<label>Стара ціна, грн<input type="number" name="old_price" min="0" max="9999999" step="1"></label>
+<label>Стара ціна, грн<input type="number" name="old_price" min="0" max="9999999" step="1"><small id="discountPreview">Знижка не встановлена</small></label>
 <label>Розміри через кому<input name="sizes" placeholder="XS, S, M, L, XL"></label>
 <label>Позначка<select name="badge"><option value="">Без позначки</option><option>NEW</option><option>SALE</option><option>TOP</option><option>HIT</option><option>LIMITED</option></select></label>
 <label class="wide">Опис товару<textarea name="description" rows="4" maxlength="6000"></textarea></label>
@@ -27,6 +27,8 @@ const $=id=>document.getElementById(id),money=n=>Number(n).toLocaleString('uk-UA
 let owner=false,items=[],editing=null,photos=[];
 $('productSearch').addEventListener('input',renderList);
 $('productFilter').addEventListener('change',renderList);
+function updateDiscount(){const f=$('form').elements;const price=Number(f.price.value),old=Number(f.old_price.value);$('discountPreview').textContent=old>price&&price>=0?'Знижка: −'+Math.round((1-price/old)*100)+'%':'Знижка не встановлена'}
+$('form').elements.price.addEventListener('input',updateDiscount);$('form').elements.old_price.addEventListener('input',updateDiscount);
 $('login').onclick=async()=>{await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/admin/products.html'}})};
 $('logout').onclick=async()=>{await sb.auth.signOut();location.href='/admin/'};
 function message(s){$('status').textContent=s}
@@ -42,7 +44,7 @@ function openEditor(p){
  $('form').elements.old_price.value=p?.old_price??'';
  $('form').elements.sizes.value=(p?.sizes||[]).join(', ');
  $('form').elements.published.checked=Boolean(p?.published);
- photos=[...(p?.image_urls||[])];drawPhotos();message('');
+ photos=[...(p?.image_urls||[])];drawPhotos();updateDiscount();message('');
  $('editorTitle').textContent=p?'Редагувати товар':'Новий товар';
  $('editor').hidden=false;$('editor').scrollIntoView({behavior:'smooth'});
 }
@@ -69,6 +71,8 @@ $('form').onsubmit=async ev=>{
  const btn=$('save');btn.disabled=true;message('Завантажуємо та зберігаємо…');
  try{
   const files=Array.from($('upload').files);
+  const price=Number($('form').elements.price.value),old=Number($('form').elements.old_price.value);
+  if($('form').elements.old_price.value&&old<=price)throw Error('Стара ціна має бути більшою за нову ціну');
   if(files.length+photos.length>10)throw Error('Максимум 10 фотографій');
   for(const f of files){
    if(!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>10*1024*1024)throw Error('Фото має бути JPG, PNG або WebP до 10 МБ');
