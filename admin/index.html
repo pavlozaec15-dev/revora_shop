@@ -127,6 +127,20 @@ async function loadOrderStats(){
  document.getElementById('analyticsAverage').textContent=money(orders.filter(o=>o.status!=='cancelled').length?revenue/orders.filter(o=>o.status!=='cancelled').length:0);
  document.getElementById('analyticsCancelled').textContent=String(orders.filter(o=>o.status==='cancelled').length);
  document.getElementById('analyticsCompletedRevenue').textContent=money(completedTotal);
+ const chart=document.getElementById('analyticsDailyChart');
+ if(chart){
+  chart.replaceChildren();
+  const days=Array.from({length:7},(_,i)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-(6-i));return d});
+  const totals=days.map(d=>orders.filter(o=>o.created_at&&new Date(o.created_at).toDateString()===d.toDateString()).length);
+  const max=Math.max(1,...totals);
+  days.forEach((day,i)=>{
+   const col=document.createElement('div');col.style.cssText='flex:1;min-width:42px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:end;gap:7px';
+   const count=document.createElement('b');count.textContent=String(totals[i]);
+   const bar=document.createElement('div');bar.style.cssText='width:65%;max-width:52px;background:#b49569;border-radius:4px 4px 0 0;height:'+Math.max(3,Math.round(totals[i]/max*110))+'px';
+   const label=document.createElement('small');label.textContent=day.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'});
+   col.append(count,bar,label);chart.append(col);
+  });
+ }
  const counts=new Map();
  for(const order of orders.filter(o=>o.status!=='cancelled'))for(const item of (Array.isArray(order.items)?order.items:[])){
   const name=String(item.name||item.title||'Товар без назви');const qty=Number(item.qty??item.quantity??1);
