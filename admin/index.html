@@ -127,6 +127,20 @@ async function loadOrderStats(){
  document.getElementById('analyticsAverage').textContent=money(orders.filter(o=>o.status!=='cancelled').length?revenue/orders.filter(o=>o.status!=='cancelled').length:0);
  document.getElementById('analyticsCancelled').textContent=String(orders.filter(o=>o.status==='cancelled').length);
  document.getElementById('analyticsCompletedRevenue').textContent=money(completedTotal);
+ const monthly=document.getElementById('analyticsMonthlyChart');
+ if(monthly){
+  monthly.replaceChildren();
+  const days=Array.from({length:30},(_,i)=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-(29-i));return d});
+  const amounts=days.map(d=>orders.filter(o=>o.status!=='cancelled'&&o.created_at&&new Date(o.created_at).toDateString()===d.toDateString()).reduce((s,o)=>s+Number(o.total_amount||0),0));
+  const max=Math.max(1,...amounts);
+  days.forEach((day,i)=>{
+   const col=document.createElement('div');col.style.cssText='flex:1;min-width:12px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:end;gap:6px';
+   const bar=document.createElement('div');bar.style.cssText='width:85%;background:#b49569;border-radius:3px 3px 0 0;height:'+Math.max(3,Math.round(amounts[i]/max*110))+'px';
+   bar.title=day.toLocaleDateString('uk-UA')+' — '+money(amounts[i]);
+   const label=document.createElement('small');label.style.cssText='font-size:9px;white-space:nowrap';label.textContent=i%5===0||i===29?day.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit'}):' ';
+   col.append(bar,label);monthly.append(col);
+  });
+ }
  const chart=document.getElementById('analyticsDailyChart');
  if(chart){
   chart.replaceChildren();
