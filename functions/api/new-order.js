@@ -39,6 +39,11 @@ async function handler(req, res, env) {
   }
   let record;
   let currentCatalog;
+  let storeSettings;
+  try {storeSettings=await readStoreSettings(env)}
+  catch(e){console.error('STORE SETTINGS:',e.message);return res.status(503).json({ok:false,error:'Не вдалося перевірити налаштування магазину. Спробуйте пізніше.'})}
+  if(storeSettings.delivery_enabled==='false')return res.status(403).json({ok:false,error:'Доставку тимчасово вимкнено. Оформлення замовлень недоступне.'});
+  if(storeSettings.cod_enabled==='false')return res.status(403).json({ok:false,error:'Післяплату вимкнено. Оформлення замовлень тимчасово недоступне.'});
   let promoCode = '';
   let promoDiscount = 0;
   try { currentCatalog = await getOrderCatalog(env, req.body?.items); }
