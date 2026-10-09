@@ -149,6 +149,10 @@ export async function onRequest(context) {
    setHeader(name,value){headers.set(name,value)},
    status(statusCode){return {json(payload){return new Response(JSON.stringify(payload),{status:statusCode,headers:new Headers([...headers,['Content-Type','application/json; charset=utf-8']])})}}}
  };
+ if(request.method==='GET'){
+  try{const settings=await readStoreSettings(env);return res.status(200).json({ok:true,settings})}
+  catch(e){console.error('STORE SETTINGS:',e.message);return res.status(503).json({ok:false,error:'Налаштування тимчасово недоступні.'})}
+ }
  if(request.method!=='POST')return res.status(405).json({ok:false,error:'Method Not Allowed'});
  let body;
  try{body=await request.json()}catch{return res.status(400).json({ok:false,error:'Неправильний формат запиту.'})}
