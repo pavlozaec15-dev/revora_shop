@@ -20,7 +20,7 @@
 <section class="section" id="orders"><div class="panel"><p><a href="orders.html" class="action" style="display:inline-block;margin-bottom:18px">ВІДКРИТИ КЕРУВАННЯ ЗАМОВЛЕННЯМИ →</a></p><div class="ptop"><h2>Список замовлень</h2><span>ОЧІКУЄ ПІДКЛЮЧЕННЯ</span></div><table class="fauxTable"><thead><tr><th>Номер</th><th>Покупець</th><th>Сума</th><th>Статус</th><th>Дата</th></tr></thead><tbody id="orderRows"><tr><td colspan="5">Очікуємо дані…</td></tr></tbody></table></div></section>
 <section class="section" id="products"><div class="panel"><div class="ptop"><h2>Керування товарами</h2><span>КАТАЛОГ</span></div><div class="empty"><div class="symbol">◇</div><b>Редактор товарів REVORA</b><p>Додавайте назви, описи, ціни, розміри та фотографії у захищеній панелі.</p><a href="products.html" class="action" style="display:inline-block;margin-top:16px">ВІДКРИТИ КЕРУВАННЯ ТОВАРАМИ →</a></div></div></section>
 <section class="section" id="promos"><div class="panel"><p><a href="promos.html" class="action" style="display:inline-block;margin-bottom:18px">КЕРУВАТИ ПРОМОКОДАМИ →</a></p><div class="ptop"><h2>Акції та промокоди</h2><span>МАРКЕТИНГ</span></div><div class="empty"><div class="symbol">%</div><b>Тут будуть промокоди та банери</b><p>Термін дії, сума або відсоток знижки, ліміти використання.</p></div></div></section>
-<section class="section" id="analytics"><div class="panel"><div class="ptop"><h2>Аналітика продажів</h2><span>СТАТИСТИКА</span></div><div class="empty"><div class="symbol">▥</div><b>Аналітика ще не підключена</b><p>Виручка, прибуток, середній чек і найпопулярніші товари.</p></div></div></section>
+<section class="section" id="analytics"><div class="panel"><div class="ptop"><h2>Аналітика продажів</h2><button type="button" class="action" id="analyticsRefresh">ОНОВИТИ ДАНІ</button></div><p id="analyticsNotice" role="status">Завантаження аналітики…</p><div class="stats"><div class="stat"><div class="k">Усього замовлень</div><strong id="analyticsOrders">—</strong></div><div class="stat"><div class="k">Оборот без скасованих</div><strong id="analyticsRevenue">—</strong></div><div class="stat"><div class="k">Завершені замовлення</div><strong id="analyticsCompleted">—</strong></div><div class="stat"><div class="k">Середній чек без скасованих</div><strong id="analyticsAverage">—</strong></div><div class="stat"><div class="k">Скасовані замовлення</div><strong id="analyticsCancelled">—</strong></div><div class="stat"><div class="k">Сума завершених замовлень</div><strong id="analyticsCompletedRevenue">—</strong></div></div><h2>Найпопулярніші товари</h2><div id="analyticsTopProducts">Завантаження…</div><p>Оборот — сума замовлень, а не підтверджена оплата чи чистий прибуток. Популярність товарів рахується за кількістю одиниць у нескасованих замовленнях.</p></div></section>
 <section class="section" id="team"><div class="panel"><div class="ptop"><h2>Працівники та доступ</h2><span>БЕЗПЕКА</span></div><div class="staff"><b>Ролі адміністраторів</b><p>Власник магазину, менеджер замовлень та редактор товарів. Доступ буде доступний тільки після авторизації й перевірки ролей на сервері.</p></div></div></section>
 <section class="section" id="settings"><div class="panel"><div class="ptop"><h2>Налаштування магазину</h2><span>СИСТЕМА</span></div><div class="empty"><div class="symbol">⚙</div><b>Налаштування будуть підключені пізніше</b><p>Доставка, оплата, Telegram-сповіщення та права доступу.</p></div></div></section>
 </main></div>
@@ -44,18 +44,34 @@ async function loadOrderStats(){
  const notice=document.getElementById('dataNotice');
  let orders=[],error=null;
  for(let start=0;start<50000;start+=500){
-  const result=await supabase.from('orders').select('number,customer_name,total_amount,status,created_at').order('created_at',{ascending:false}).range(start,start+499);
+  const result=await supabase.from('orders').select('number,customer_name,total_amount,status,created_at,items').order('created_at',{ascending:false}).range(start,start+499);
   if(result.error){error=result.error;break}
   orders.push(...(result.data||[]));
   if((result.data||[]).length<500)break;
  }
  const {count:productCount,error:productError}=await supabase.from('products').select('id',{count:'exact',head:true});
  const {count:publishedCount,error:publishedError}=await supabase.from('products').select('id',{count:'exact',head:true}).eq('published',true);
- if(error){notice.textContent='Замовлення ще не підключені: потрібно налаштувати таблицю orders у Supabase.';document.getElementById('orderRows').innerHTML='<tr><td colspan="5">Дані недоступні.</td></tr>';return;}
+ if(error){document.getElementById('analyticsNotice').textContent='Помилка завантаження аналітики: '+error.message;document.getElementById('analyticsTopProducts').textContent='Дані недоступні.';notice.textContent='Не вдалося завантажити замовлення: '+error.message;document.getElementById('orderRows').innerHTML='<tr><td colspan="5">Дані недоступні.</td></tr>';return;}
  const revenue=orders.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+Number(o.total_amount||0),0);
  const completed=orders.filter(o=>o.status==='completed');
  const completedTotal=completed.reduce((s,o)=>s+Number(o.total_amount||0),0);
  document.getElementById('statSales').textContent=String(completed.length);
+ document.getElementById('analyticsOrders').textContent=String(orders.length);
+ document.getElementById('analyticsRevenue').textContent=money(revenue);
+ document.getElementById('analyticsCompleted').textContent=String(completed.length);
+ document.getElementById('analyticsAverage').textContent=money(orders.filter(o=>o.status!=='cancelled').length?revenue/orders.filter(o=>o.status!=='cancelled').length:0);
+ document.getElementById('analyticsCancelled').textContent=String(orders.filter(o=>o.status==='cancelled').length);
+ document.getElementById('analyticsCompletedRevenue').textContent=money(completedTotal);
+ const counts=new Map();
+ for(const order of orders.filter(o=>o.status!=='cancelled'))for(const item of (Array.isArray(order.items)?order.items:[])){
+  const name=String(item.name||item.title||'Товар без назви');const qty=Number(item.qty??item.quantity??1);
+  if(Number.isFinite(qty)&&qty>0)counts.set(name,(counts.get(name)||0)+qty);
+ }
+ const top=document.getElementById('analyticsTopProducts');top.replaceChildren();
+ const sorted=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10);
+ if(!sorted.length)top.textContent='Немає даних про товари в замовленнях.';
+ else {const list=document.createElement('ol');sorted.forEach(([name,qty])=>{const li=document.createElement('li');li.textContent=name+' — '+qty+' шт.';li.style.padding='6px 0';list.append(li)});top.append(list)}
+ document.getElementById('analyticsNotice').textContent='Оновлено: '+new Date().toLocaleString('uk-UA')+(orders.length>=50000?' · Дані можуть бути неповними':'');
  document.getElementById('statPaid').textContent=money(completedTotal);
  document.getElementById('statProducts').textContent=productError?'—':String(productCount??0);
  document.getElementById('publishedProducts').textContent=productError||publishedError?'Не вдалося отримати товари':'Опубліковано: '+publishedCount;
@@ -73,6 +89,7 @@ async function loadOrderStats(){
  else{recent.className='';const table=document.createElement('table');table.className='fauxTable';const body=document.createElement('tbody');orders.slice(0,6).forEach(o=>body.append(row(o)));table.append(body);recent.append(table)}
 }
 
+document.getElementById('analyticsRefresh').addEventListener('click',()=>loadOrderStats().catch(e=>document.getElementById('analyticsNotice').textContent='Помилка: '+e.message));
 supabase.auth.onAuthStateChange((_event,_session)=>{setTimeout(verifyAdmin,0)});
 verifyAdmin().catch(()=>say('Не вдалося перевірити доступ. Оновіть сторінку.'));
 </script></body></html>
