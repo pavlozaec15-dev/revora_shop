@@ -17,6 +17,15 @@ async function getOrderCatalog(env, orderedItems) {
   return [...staticItems, ...active.map(x => ({ id:x.id, name:x.name, price:Number(x.price), sizes:x.sizes||[] }))];
 }
 
+async function readStoreSettings(env) {
+ const url=env.SUPABASE_URL,key=env.SUPABASE_SERVICE_ROLE_KEY;
+ if(!url||!key)throw Error('Missing settings configuration');
+ const response=await fetch(url.replace(/\/$/,'')+'/rest/v1/store_settings?select=key,value',{headers:{apikey:key,...(key.startsWith('sb_secret_')?{}:{Authorization:'Bearer '+key})},signal:AbortSignal.timeout(10000)});
+ if(!response.ok)throw Error('Settings HTTP '+response.status);
+ const settings={store_name:'REVORA',contact_phone:'',delivery_enabled:'true',cod_enabled:'true',telegram_enabled:'false'};
+ for(const row of await response.json())if(Object.hasOwn(settings,row.key))settings[row.key]=row.value;
+ return settings;
+}
 const text = (value, max, required = true) => {
   if (typeof value !== 'string' || value.trim().length > max || (required && !value.trim())) throw new Error('Invalid customer details');
   return value.trim();
