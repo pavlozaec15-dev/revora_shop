@@ -120,6 +120,11 @@ async function loadOrderStats(){
  const revenue=orders.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+Number(o.total_amount||0),0);
  const completed=orders.filter(o=>o.status==='completed');
  const completedTotal=completed.reduce((s,o)=>s+Number(o.total_amount||0),0);
+ const today=new Date();today.setHours(0,0,0,0);
+ const week=new Date(today);week.setDate(week.getDate()-6);
+ document.getElementById('statNew').textContent=String(orders.filter(o=>o.status==='new').length);
+ document.getElementById('statToday').textContent=String(orders.filter(o=>o.created_at&&new Date(o.created_at)>=today).length);
+ document.getElementById('statWeekRevenue').textContent=money(orders.filter(o=>o.status!=='cancelled'&&o.created_at&&new Date(o.created_at)>=week).reduce((s,o)=>s+Number(o.total_amount||0),0));
  document.getElementById('statSales').textContent=String(completed.length);
  document.getElementById('analyticsOrders').textContent=String(orders.length);
  document.getElementById('analyticsRevenue').textContent=money(revenue);
