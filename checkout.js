@@ -14,6 +14,31 @@ let novaPoshtaUnavailable = false;
 let cityTimer;
 let warehouseTimer;
 let appliedPromo = null;
+let storeCheckoutSettings=null;
+async function loadCheckoutSettings(){
+ const btn=document.querySelector('.placeOrder');
+ try{
+  const response=await fetch('/api/new-order',{cache:'no-store'});
+  const result=await response.json();
+  if(!response.ok||!result.ok)throw Error(result.error||'Налаштування недоступні');
+  storeCheckoutSettings=result.settings;
+  const deliveryAllowed=storeCheckoutSettings.delivery_enabled!=='false';
+  const codAllowed=storeCheckoutSettings.cod_enabled!=='false';
+  const cod=document.querySelector('input[name="payment"][value="cod"]');
+  if(cod)cod.disabled=!codAllowed;
+  if(btn)btn.disabled=!deliveryAllowed||!codAllowed||!checkoutCart.length;
+  let notice=document.getElementById('checkoutSettingsNotice');
+  if(!notice){notice=document.createElement('p');notice.id='checkoutSettingsNotice';notice.setAttribute('role','status');form.prepend(notice)}
+  notice.textContent=!deliveryAllowed?'Доставку тимчасово вимкнено.':!codAllowed?'Післяплата тимчасово недоступна.':'';
+ }catch(e){
+  storeCheckoutSettings=null;
+  if(btn)btn.disabled=true;
+  let notice=document.getElementById('checkoutSettingsNotice');
+  if(!notice){notice=document.createElement('p');notice.id='checkoutSettingsNotice';notice.setAttribute('role','status');form.prepend(notice)}
+  notice.textContent='Неможливо перевірити налаштування магазину. Оновіть сторінку пізніше.';
+ }
+}
+
 
 
 /* =========================
@@ -705,6 +730,7 @@ form.onsubmit =
     if (!checkoutCart.length) {
       return;
     }
+    if(!storeCheckoutSettings||storeCheckoutSettings.delivery_enabled==='false'||storeCheckoutSettings.cod_enabled==='false'){alert('Оформлення замовлення зараз недоступне.');return}
 
     if (!selectedCityRef && !novaPoshtaUnavailable) {
 
@@ -884,3 +910,4 @@ form.onsubmit =
   };
 
 renderCheckout();
+loadCheckoutSettings();
