@@ -12,7 +12,7 @@
 <label>Категорія *<select name="category" required><option value="">Обери категорію</option><optgroup label="ОДЯГ"><option>Жилети</option><option>Светри та гольфи</option><option>Зіп-худі</option><option>Худі</option><option>Світшоти</option><option>Пуховики</option><option>Штани та джинси</option><option>Футболки</option><option>Шорти</option><option>Куртки та вітровки</option><option>Кросівки</option><option>Капці</option></optgroup><optgroup label="АКСЕСУАРИ"><option>Ланцюжки</option><option>Сумки та бананки</option><option>Окуляри</option><option>Шапки</option><option>Шарфи та рукавиці</option><option>Панами та кепки</option><option>Жіночі сумки</option><option>Ремені</option><option>Гаманці</option><option>Рюкзаки</option></optgroup><optgroup label="ТЕХНІКА"><option>Годинники</option><option>Навушники</option></optgroup><optgroup label="ІНШЕ"><option>Аксесуари</option><option>Куртки</option><option>Худі</option><option>Штани</option><option>Світшоти</option><option>Сумки</option><option>Головні убори</option></optgroup></select></label>
 <label>Ціна, грн *<input type="number" name="price" required min="0" max="9999999" step="1"></label>
 <label>Стара ціна, грн<input type="number" name="old_price" min="0" max="9999999" step="1"><small id="discountPreview">Знижка не встановлена</small></label>
-<label>Розміри через кому<input name="sizes" placeholder="XS, S, M, L, XL"></label>
+<label>Розміри через кому<input name="sizes" placeholder="XS, S, M, L, XL"></label><label>Кольори через кому<input name="colors" placeholder="Чорний, Білий, Сірий"></label>
 <label>Позначка<select name="badge"><option value="">Без позначки</option><option>NEW</option><option>SALE</option><option>TOP</option><option>HIT</option><option>LIMITED</option></select></label>
 <label class="wide">Опис товару<textarea name="description" rows="4" maxlength="6000"></textarea></label>
 <label class="wide">Фотографії (JPG, PNG або WebP, максимум 10 МБ на фото)<input type="file" id="upload" accept="image/jpeg,image/png,image/webp" multiple></label>
@@ -50,7 +50,7 @@ function openEditor(p){
  for(const name of ['name','category','description','badge'])$('form').elements[name].value=p?.[name]||'';
  $('form').elements.price.value=p?.price??'';
  $('form').elements.old_price.value=p?.old_price??'';
- $('form').elements.sizes.value=(p?.sizes||[]).join(', ');
+ $('form').elements.sizes.value=(p?.sizes||[]).join(', ');$('form').elements.colors.value=(p?.colors||[]).join(', ');
  $('form').elements.published.checked=Boolean(p?.published);
  photos=[...(p?.image_urls||[])];drawPhotos();updateDiscount();message('');
  $('editorTitle').textContent=p?'Редагувати товар':'Новий товар';
@@ -93,7 +93,7 @@ $('form').onsubmit=async ev=>{
   drawPhotos();
   const form=$('form').elements;
   if(form.published.checked&&!photos.length)throw Error('Для публікації додай хоча б одне фото');
-  const record={name:form.name.value.trim(),category:form.category.value,description:form.description.value.trim(),price:Number(form.price.value),old_price:form.old_price.value?Number(form.old_price.value):null,sizes:form.sizes.value.split(',').map(x=>x.trim()).filter(Boolean),badge:form.badge.value,image_urls:photos,published:form.published.checked,updated_at:new Date().toISOString()};
+  const record={name:form.name.value.trim(),category:form.category.value,description:form.description.value.trim(),price:Number(form.price.value),old_price:form.old_price.value?Number(form.old_price.value):null,sizes:form.sizes.value.split(',').map(x=>x.trim()).filter(Boolean),colors:form.colors.value.split(',').map(x=>x.trim()).filter(Boolean),badge:form.badge.value,image_urls:photos,published:form.published.checked,updated_at:new Date().toISOString()};
   const q=editing?sb.from('products').update(record).eq('id',editing):sb.from('products').insert(record);
   const {error}=await q.select('id').single();
   if(error)throw Error(error.message);
