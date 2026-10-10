@@ -87,14 +87,14 @@ function renderCheckout() {
         <b>${x.name}</b>
 
         <small>
-          ${x.size ? `Розмір: ${x.size}` : "Без розміру"}
+          ${x.size ? `Розмір: ${x.size}` : "Без розміру"}${x.color ? ` · Колір: ${x.color}` : ""}
         </small>
 
         <div class="checkoutQty">
 
           <button
             type="button"
-            data-minus="${x.id}|${x.size}"
+            data-minus="${x.id}|${x.size}|${x.color||""}"
           >
             −
           </button>
@@ -103,7 +103,7 @@ function renderCheckout() {
 
           <button
             type="button"
-            data-plus="${x.id}|${x.size}"
+            data-plus="${x.id}|${x.size}|${x.color||""}"
           >
             +
           </button>
@@ -183,12 +183,13 @@ function renderCheckout() {
 }
 
 function changeQty(key, delta) {
-  const [id, size] = key.split("|");
+  const [id, size, color=""] = key.split("|");
 
   const product = checkoutCart.find(
     x =>
       String(x.id) === String(id) &&
-      String(x.size) === String(size)
+      String(x.size) === String(size) &&
+      String(x.color||"") === String(color)
   );
 
   if (!product) return;
