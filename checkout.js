@@ -75,7 +75,7 @@ function renderCheckout() {
         <b>${x.name}</b>
 
         <small>
-          Розмір: ${x.size}
+          ${x.size ? `Розмір: ${x.size}` : "Без розміру"}
         </small>
 
         <div class="checkoutQty">
