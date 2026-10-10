@@ -32,10 +32,12 @@ async function loadCheckoutSettings(){
   notice.textContent=!deliveryAllowed?'Доставку тимчасово вимкнено.':!codAllowed?'Післяплата тимчасово недоступна.':'';
  }catch(e){
   storeCheckoutSettings=null;
-  if(btn)btn.disabled=true;
+  // Keep checkout available if the settings endpoint is temporarily unreachable.
+  // The order API still validates settings and the order server-side.
+  if(btn)btn.disabled=!checkoutCart.length;
   let notice=document.getElementById('checkoutSettingsNotice');
   if(!notice){notice=document.createElement('p');notice.id='checkoutSettingsNotice';notice.setAttribute('role','status');form.prepend(notice)}
-  notice.textContent='Неможливо перевірити налаштування магазину. Оновіть сторінку пізніше.';
+  notice.textContent='Не вдалося завантажити налаштування. Ви можете спробувати оформити замовлення — сервер перевірить його перед збереженням.';
  }
 }
 
@@ -731,7 +733,7 @@ form.onsubmit =
     if (!checkoutCart.length) {
       return;
     }
-    if(!storeCheckoutSettings||storeCheckoutSettings.delivery_enabled==='false'||storeCheckoutSettings.cod_enabled==='false'){alert('Оформлення замовлення зараз недоступне. Спробуйте пізніше.');return}
+    if(storeCheckoutSettings&&(storeCheckoutSettings.delivery_enabled==='false'||storeCheckoutSettings.cod_enabled==='false')){alert('Оформлення замовлення зараз недоступне. Спробуйте пізніше.');return}
 
     // Validate contact phone before sending an order to the manager.
     const phoneField = form.querySelector('[name="phone"]');
