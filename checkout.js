@@ -66,7 +66,7 @@ function renderCheckout() {
     <div class="checkoutItem">
 
       <div class="miniPhoto">
-        REVORA
+        ${(()=>{const p=(typeof P!=='undefined'?P:[]).find(p=>String(p.id)===String(x.id));const photo=p?.images?.[0]||x.image;return photo?'<img src="'+String(photo).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')+'" alt="" loading="lazy">':'REVORA'})()}
       </div>
 
       <div>
