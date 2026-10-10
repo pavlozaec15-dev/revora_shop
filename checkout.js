@@ -854,24 +854,18 @@ form.onsubmit =
       pendingOrderNumber = null;
       appliedPromo = null;
 
-      const orders =
-        JSON.parse(
-          localStorage.getItem(
-            "revoraOrders"
-          ) || "[]"
-        );
-
-      orders.unshift(order);
-
-      localStorage.setItem(
-        "revoraOrders",
-        JSON.stringify(orders)
-      );
-
-      localStorage.removeItem(
-        "revoraCartItems"
-      );
-
+      // The server has confirmed the order. Browser storage errors must never
+      // turn a successful purchase into an apparent failed submission.
+      try {
+        let orders;
+        try { orders = JSON.parse(localStorage.getItem("revoraOrders") || "[]"); }
+        catch { orders = []; }
+        if (!Array.isArray(orders)) orders = [];
+        orders.unshift(order);
+        localStorage.setItem("revoraOrders", JSON.stringify(orders));
+      } catch (storageError) { console.warn("Local order history unavailable", storageError); }
+      try { localStorage.removeItem("revoraCartItems"); }
+      catch (storageError) { console.warn("Cart storage unavailable", storageError); }
       checkoutCart = [];
 
       const successText =
