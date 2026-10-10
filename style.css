@@ -437,3 +437,33 @@ header .tools .catalogCartCount{position:absolute;top:-6px;right:-7px;min-width:
 .checkoutPage .orderSummary .checkoutItem small{display:block;color:#7c756b;margin:6px 0}
 .checkoutPage .orderSummary .checkoutQty{border-radius:7px;overflow:hidden}
 @media(max-width:760px){.checkoutTrust{gap:7px;margin-bottom:16px}.checkoutTrust span{font-size:10px;padding:8px 10px}.checkoutPage .orderSummary .miniPhoto{width:68px;height:86px;min-width:68px}.checkoutPage .orderSummary .checkoutItem{grid-template-columns:68px minmax(0,1fr) auto;gap:8px}.checkoutPage .orderSummary .checkoutItem strong{font-size:11px}}
+
+/* REVORA checkout — sophisticated warm charcoal redesign */
+.checkoutPage{background:linear-gradient(145deg,#242421 0%,#302d28 48%,#211f1d 100%);color:#f3eee6}
+.checkoutBreadcrumb,.checkoutBreadcrumb a{color:#aaa49a}.checkoutBreadcrumb a:hover{color:#ead3af}
+.checkoutKicker{color:#cbb08a}.checkoutTitle h1{color:#f4efe8}.checkoutTitle p{color:#c2b9ad}
+.checkoutTrust span{background:#393630;color:#e0d2bc;border-color:#514b42}
+.checkoutForm,.checkoutPage .orderSummary{background:#34312d;border-color:#514b44;box-shadow:0 22px 65px #00000024;color:#f1ece5}
+.checkoutForm h2,.checkoutPage .orderSummary h2{color:#f2eee7;border-bottom-color:#514b44}
+.checkoutSectionNum{background:#4a4236;color:#dfc19a}
+.checkoutForm label{color:#ddd4c8}
+.checkoutForm input:not([type=radio]),.checkoutForm select,.checkoutForm textarea{background:#292824;border-color:#61594f;color:#f6f1ea}
+.checkoutForm input:not([type=radio]):focus,.checkoutForm select:focus,.checkoutForm textarea:focus{background:#24221f;border-color:#d1ae7c;box-shadow:0 0 0 3px #d1ae7c20;color:#fff}
+.checkoutForm input::placeholder,.checkoutForm textarea::placeholder{color:#a79e91}
+.checkoutForm .formHint,.checkoutForm .checkoutSecure{color:#bcb1a3}
+.checkoutForm #applyPromo{background:#d3b385;color:#211c16}.checkoutForm #applyPromo:hover{background:#e6c69a}
+.checkoutForm .payments label{background:#2c2a26;border-color:#5a534a;color:#e6dfd6}
+.checkoutForm .payments label:has(input:checked){background:#443c30;border-color:#c5a579}
+.checkoutPage .orderSummary>small{color:#d1b68f}
+.checkoutPage .checkoutItem,.checkoutPage .orderSummary .checkoutItem{border-bottom-color:#504b43}
+.checkoutPage .orderSummary .miniPhoto{background:#ebe6df}
+.checkoutPage .orderSummary .checkoutItem small{color:#bcb1a3}
+.checkoutPage .orderSummary .sumLine{color:#e3d9cc}
+.checkoutPage .orderSummary .sumLine.grand{border-top-color:#60574b;color:#fff}
+.checkoutForm .placeOrder{background:#d3b385;color:#201a14}.checkoutForm .placeOrder:hover{background:#e5c599}
+.checkoutPage .paymentGuide{background:#262420;border-color:#575046}
+.checkoutPage .paymentGuide .paymentGuideHead{background:#302c26;border-bottom-color:#4e473d}
+.checkoutPage .paymentGuide .paymentExample{background:#ded4c4}
+.checkoutPage .paymentGuide .paymentStep{border-bottom-color:#ffffff19}
+.checkoutPage .paymentGuide .paymentGuideFoot p{color:#bcb2a4!important}
+@media(max-width:760px){.checkoutPage{background:#292722}.checkoutForm,.checkoutPage .orderSummary{border-radius:12px}}
