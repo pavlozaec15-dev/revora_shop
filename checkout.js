@@ -727,6 +727,8 @@ if(promoInput){
 
 let pendingOrderNumber = null;
 
+form.querySelector('[name="phone"]')?.addEventListener("input", event => event.target.setCustomValidity(""));
+
 form.onsubmit =
   async event => {
 
@@ -736,6 +738,18 @@ form.onsubmit =
       return;
     }
     if(storeCheckoutSettings&&(storeCheckoutSettings.delivery_enabled==='false'||storeCheckoutSettings.cod_enabled==='false')){alert('Оформлення замовлення зараз недоступне.');return}
+
+    // Validate contact phone before sending an order to the manager.
+    const phoneField = form.querySelector('[name="phone"]');
+    const digits = (phoneField?.value || "").replace(/\\D/g, "");
+    const validPhone = /^0\\d{9}$/.test(digits) || /^380\\d{9}$/.test(digits);
+    if (!validPhone) {
+      phoneField.setCustomValidity("Введіть український номер: 0XXXXXXXXX або +380XXXXXXXXX");
+      phoneField.reportValidity();
+      phoneField.focus();
+      return;
+    }
+    phoneField.setCustomValidity("");
 
     if (!selectedCityRef && !novaPoshtaUnavailable) {
 
