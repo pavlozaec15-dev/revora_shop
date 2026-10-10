@@ -1,20 +1,16 @@
-import { REVORA_PRODUCTS as catalog } from '../_catalog.js';
-
-async function getOrderCatalog(env, orderedItems) {
-  const selected = orderedItems || [];
-  const staticItems = catalog;
-  const needsDynamic = selected.some(item => !staticItems.some(p => p.id === item?.id));
-  if (!needsDynamic) return staticItems;
+async function getOrderCatalog(env) {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY)
     throw new Error('Supabase configuration is missing');
-  const endpoint = env.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/products?published=eq.true&select=id,name,price,sizes&limit=500';
+  // Always validate against published live products: static seed prices can be stale.
+  const endpoint = env.SUPABASE_URL.replace(/\\/$/, '') + '/rest/v1/products?published=eq.true&select=id,name,price,sizes&limit=500';
   const response = await fetch(endpoint, {
     headers: { apikey: 'sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH' },
     signal: AbortSignal.timeout(10000)
   });
   if (!response.ok) throw new Error('Product validation unavailable: ' + response.status);
   const active = await response.json();
-  return [...staticItems, ...active.map(x => ({ id:x.id, name:x.name, price:Number(x.price), sizes:x.sizes||[] }))];
+  if (!Array.isArray(active)) throw new Error('Invalid live catalogue');
+  return active.map(x => ({ id:x.id, name:x.name, price:Number(x.price), sizes:x.sizes||[] }));
 }
 
 async function readStoreSettings(env) {
@@ -46,7 +42,7 @@ async function handler(req, res, env) {
   if(storeSettings.cod_enabled==='false')return res.status(403).json({ok:false,error:'Післяплату вимкнено. Оформлення замовлень тимчасово недоступне.'});
   let promoCode = '';
   let promoDiscount = 0;
-  try { currentCatalog = await getOrderCatalog(env, req.body?.items); }
+  try { currentCatalog = await getOrderCatalog(env); }
   catch (error) { console.error('PRODUCT VALIDATION FAILED:', error?.message); return res.status(503).json({ok:false,error:'Не вдалося перевірити товари з Supabase. Звернися до магазину або спробуй пізніше.'}); }
   try {
     const order = req.body;
