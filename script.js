@@ -1,4 +1,4 @@
-const HOME_PRODUCTS=window.REVORA_PRODUCTS||[];
+let HOME_PRODUCTS=window.REVORA_PRODUCTS||[];
 const moneyHome=n=>Number(n||0).toLocaleString("uk-UA")+" ₴";
 const escapeHome=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function homeCard(x){
@@ -7,9 +7,24 @@ function homeCard(x){
  return '<article class="product"><a class="productLink" href="product.html?id='+encodeURIComponent(x.id)+'"><div class="productImg">'+visual+'</div>'+(x.badge?'<div class="badge">'+escapeHome(x.badge)+'</div>':'')+'<div class="info"><small>'+escapeHome(x.category)+'</small><b>'+escapeHome(x.name)+'</b><p class="price">'+moneyHome(x.price)+(x.old?' <span class="old">'+moneyHome(x.old)+'</span>':'')+'</p></div></a><a class="add homeView" href="product.html?id='+encodeURIComponent(x.id)+'">ПЕРЕГЛЯНУТИ →</a></article>';
 }
 const grid=document.querySelector("#products");
-if(grid)grid.innerHTML=HOME_PRODUCTS.filter(x=>x.badge==="SALE").slice(0,4).map(homeCard).join("")||'<p>Незабаром тут з’являться знижки REVORA.</p>';
 const popular=document.querySelector("#popularProducts");
-if(popular)popular.innerHTML=[...HOME_PRODUCTS].sort((a,b)=>(Number(b.badge==="TOP")-Number(a.badge==="TOP"))).slice(0,4).map(homeCard).join("");
+function renderHomeProducts(){
+ if(grid)grid.innerHTML=HOME_PRODUCTS.filter(x=>x.badge==="SALE"||(Number(x.old)>Number(x.price))).slice(0,4).map(homeCard).join("")||'<p>Незабаром тут з’являться знижки REVORA.</p>';
+ if(popular)popular.innerHTML=[...HOME_PRODUCTS].sort((a,b)=>Number(b.badge==="TOP")-Number(a.badge==="TOP")).slice(0,4).map(homeCard).join("")||'<p>Товари незабаром з’являться.</p>';
+}
+renderHomeProducts();
+async function loadHomeProducts(){
+ try{
+  const response=await fetch('https://mqsytqicykgtbjjvaroa.supabase.co/rest/v1/products?published=eq.true&select=id,name,category,description,price,old_price,sizes,image_urls,badge&order=created_at.desc&limit=300',{headers:{apikey:'sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH'},cache:'no-store'});
+  if(!response.ok)throw Error('Catalogue HTTP '+response.status);
+  const rows=await response.json();if(!Array.isArray(rows))throw Error('Invalid catalogue');
+  HOME_PRODUCTS=rows.map(p=>({id:p.id,name:p.name,category:p.category||'',desc:p.description||'',price:Number(p.price),old:p.old_price==null?null:Number(p.old_price),sizes:p.sizes||[],images:p.image_urls||[],badge:p.badge||''}));
+  renderHomeProducts();
+ }catch(error){console.warn('Home products Supabase unavailable, trying API',error);
+  try{const response=await fetch('/api/products',{cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok||!Array.isArray(data.products))throw Error('Catalogue unavailable');HOME_PRODUCTS=data.products;renderHomeProducts()}catch(e){console.warn('Home products unavailable',e)}
+ }
+}
+loadHomeProducts();
 const slides=[...document.querySelectorAll(".heroSlide")];let current=0,timer;
 function showSlide(i){if(!slides.length)return;current=(i+slides.length)%slides.length;slides.forEach((s,n)=>{s.classList.toggle("active",n===current);s.setAttribute("aria-hidden",n!==current?"true":"false")});const no=document.querySelector("#heroNo");if(no)no.textContent=String(current+1).padStart(2,"0")+" / "+String(slides.length).padStart(2,"0")}
 function autoHero(){clearInterval(timer);if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;timer=setInterval(()=>{if(!document.hidden)showSlide(current+1)},5500)}
