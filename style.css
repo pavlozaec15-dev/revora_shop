@@ -298,3 +298,17 @@ header .tools .headerAccount svg{width:18px;height:18px;stroke-width:1.8}
 .noProducts .emptyReset{margin-top:18px;padding:12px 20px;background:#d7b784;color:#111;border:1px solid #d7b784;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:background .2s,border-color .2s}
 .noProducts .emptyReset:hover{background:#f0d4a7;border-color:#f0d4a7}
 .noProducts .emptyReset:focus-visible{outline:2px solid #d7b784;outline-offset:3px}
+
+/* REVORA premium catalogue navigation */
+.catalogPage .catalogTop{padding-bottom:18px}
+.revoraBrowse{margin:8px 0 24px;padding:24px 26px;border-radius:16px;background:linear-gradient(125deg,#191919,#31291e);border:1px solid #bca07855;color:#f5eee3}
+.revoraBrowseTitle{display:flex;flex-direction:column;gap:7px;margin-bottom:19px}
+.revoraBrowseTitle span{font-size:10px;letter-spacing:.23em;color:#d7b98c;font-weight:700}
+.revoraBrowseTitle strong{font:normal clamp(19px,2.8vw,29px) Georgia,serif}
+.revoraTabs{display:flex;gap:9px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:thin;scrollbar-color:#977e5b transparent}
+.revoraTabs button{flex:0 0 auto;padding:11px 17px;background:#ffffff0d;border:1px solid #ffffff35;border-radius:100px;color:#f7f1e8;cursor:pointer;font:600 12px system-ui;transition:background .2s,color .2s}
+.revoraTabs button:hover,.revoraTabs button.active{background:#d8ba8b;color:#18130e;border-color:#d8ba8b}
+.revoraCatalogBar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.revoraCatalogBar>span{font-size:11px;letter-spacing:.16em;opacity:.7}
+.revoraCatalogBar .filterToggle{margin:0}
+@media(max-width:650px){.revoraBrowse{padding:20px 16px;margin:4px 0 18px}.revoraBrowseTitle strong{font-size:21px}.revoraTabs button{padding:10px 14px}.revoraCatalogBar>span{font-size:9px}}
