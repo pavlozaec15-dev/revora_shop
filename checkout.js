@@ -147,10 +147,10 @@ function renderCheckout() {
 
     ${discount ? '<div class="sumLine"><span>Знижка '+appliedPromo.code+'</span><b>−'+cMoney(discount)+'</b></div>' : ''}
     <div class="sumLine grand">
-      <span>Сума товарів до оплати при отриманні</span>
+      <span>Товари до оплати при отриманні</span>
       <b>${cMoney(subtotal-discount)}</b>
     </div>
-    <p class="formHint">Оплата товарів — при отриманні після підтвердження менеджером. Доставка та комісії перевізника, якщо є, оплачуються окремо.</p>
+    <div class="sumLine"><span>Окрема передоплата постачальнику (після узгодження з менеджером)</span><b>200 ₴</b></div><div class="sumLine grand"><span>Загалом, без доставки</span><b>${cMoney(subtotal-discount+200)}</b></div><p class="formHint">200 грн не входять у вартість товару та не віднімаються від суми післяплати. Зараз сайт не приймає платежі. Умови повернення передоплати уточнюйте до оплати.</p>
   `;
 
   items
