@@ -484,3 +484,42 @@ header .tools .catalogCartCount{position:absolute;top:-6px;right:-7px;min-width:
 .checkoutPage .paymentGuide .paymentExample{background:#e5dfd6}
 .checkoutPage .orderSummary .sumLine.grand{border-top-color:#66666a}
 @media(max-width:760px){.checkoutPage{background:#2c2e31}}
+
+/* REVORA storefront unified graphite design — checkout-inspired */
+:root{--rv-bg:#2c2e31;--rv-surface:#3b3d40;--rv-surface2:#343639;--rv-line:#55585c;--rv-text:#f3eee8;--rv-muted:#bdb7af;--rv-accent:#e2d5c3}
+body{background:var(--rv-bg);color:var(--rv-text)}
+.topbar{background:#ded1be;color:#242528}
+header{background:#2a2c2ff2;border-bottom:1px solid #4b4e51}
+.logo{color:#f8f4ee}nav a,footer a{color:#c5bfb7}nav a:hover,.logo:hover{color:#e2d5c3}
+.tools button,.mobile{border-color:#595c60;color:#eee}
+.mobileNav.open{background:#323437;border-bottom:1px solid #55585c}
+.hero{background:radial-gradient(circle at 76% 35%,#4a4743 0%,#343538 39%,#292b2e 85%)}
+.heroCopy>p{color:#ccc5bd}.hero h1 em,.story h2 em{color:#e2d5c3}
+.heroVisual{background:linear-gradient(145deg,#454544,#303235);border-color:#67615a;border-radius:12px;box-shadow:0 20px 60px #0003}
+.primary,.add{background:#e2d5c3;color:#242424;border-radius:8px;font-weight:700}
+.primary:hover,.add:hover{background:#f2e7d8}.ghost{border-color:#77726d;color:#f1ede7;border-radius:8px}
+.benefits{background:#333538;border-color:#55585c;color:#ddd5ca}
+.section{background:#2c2e31;color:#f3eee8}
+.section.light,.light{background:#343639;color:#f4f0e9}
+.section.black,.black{background:#292b2e;color:#f4f0e9}
+.sectionHead>a{color:#e2d5c3}
+.product{background:#3b3d40;color:#f4f0e9;border:1px solid #53565a;border-radius:12px;overflow:hidden;transition:transform .2s,border-color .2s}
+.product:hover{transform:translateY(-3px);border-color:#928777}
+.productImg{background:#e4e0d9;color:#746c61}
+.product .info{color:#f4f0e9}.product .price{color:#f4f0e9}.product .old{color:#b4aaa0}
+.badge{background:#333538;color:#f5f0e8;border-radius:5px}
+.editorial,.editorial article{border-color:#53565a}.editorial b,.why b{color:#dfc9ac}.editorial p,.why p{color:#c6beb3}
+.categories{border-color:#636366}.categories a{border-color:#636366;color:#f3eee8;text-decoration:none}
+.story{background:#37393c;color:#f4f0e9}.why h3{color:#f4f0e9}
+.telegram{background:#292b2e}.telegram a{color:#e2d5c3;border-color:#e2d5c3}
+footer{background:#26282b;border-color:#4d5053;color:#e8e1d9}footer p{color:#bcb4aa}
+.drawer{background:#383a3d;color:#f5f0e9;border-left:1px solid #56595d;box-shadow:-15px 0 50px #0005}
+.drawer #close{color:#f5f0e9}
+.drawer .cartProduct{border-bottom-color:#55585c}
+.drawer .cartProductInfo>a,.drawer .cartProductInfo b{color:#f3eee8}
+.drawer .cartProductPhoto{background:#e9e5de}
+/* Catalog and product page surfaces: preserve photos while matching the new palette */
+.catalogPage,.productPage,.catalogMain,.productMain{background:var(--rv-bg);color:var(--rv-text)}
+.catalogPage h1,.productPage h1,.catalogMain h1,.productMain h1{color:var(--rv-text)}
+.catalogPage select,.catalogPage input,.catalogMain select,.catalogMain input{background:#383a3d;color:#f3eee8;border-color:#62656a}
+@media(max-width:760px){.hero{background:linear-gradient(150deg,#35373a,#292b2e)}.section.light,.light{background:#343639}.product{border-radius:9px}.product:hover{transform:none}}
