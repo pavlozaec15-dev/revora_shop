@@ -2,7 +2,7 @@ async function getOrderCatalog(env) {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY)
     throw new Error('Supabase configuration is missing');
   // Always validate against published live products: static seed prices can be stale.
-  const endpoint = env.SUPABASE_URL.replace(/\\/$/, '') + '/rest/v1/products?published=eq.true&select=id,name,price,sizes&limit=500';
+  const endpoint = env.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/products?published=eq.true&select=id,name,price,sizes&limit=500';
   const response = await fetch(endpoint, {
     headers: { apikey: 'sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH' },
     signal: AbortSignal.timeout(10000)
