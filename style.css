@@ -467,3 +467,20 @@ header .tools .catalogCartCount{position:absolute;top:-6px;right:-7px;min-width:
 .checkoutPage .paymentGuide .paymentStep{border-bottom-color:#ffffff19}
 .checkoutPage .paymentGuide .paymentGuideFoot p{color:#bcb2a4!important}
 @media(max-width:760px){.checkoutPage{background:#292722}.checkoutForm,.checkoutPage .orderSummary{border-radius:12px}}
+
+/* Checkout: softer neutral dark palette, less gold */
+.checkoutPage{background:linear-gradient(145deg,#2b2d30 0%,#343538 55%,#292b2e 100%)}
+.checkoutForm,.checkoutPage .orderSummary{background:#3b3d40;border-color:#55585c}
+.checkoutForm h2,.checkoutPage .orderSummary h2{border-bottom-color:#56585a}
+.checkoutTrust span{background:#3d4043;border-color:#575a5d;color:#e1ded9}
+.checkoutForm input:not([type=radio]),.checkoutForm select,.checkoutForm textarea{background:#303235;border-color:#65676a}
+.checkoutForm .payments label{background:#333538;border-color:#5d6063}
+.checkoutForm .payments label:has(input:checked){background:#474746;border-color:#b8a99a}
+.checkoutSectionNum{background:#505052;color:#e6d9c7}
+.checkoutForm #applyPromo,.checkoutForm .placeOrder{background:#e2d5c3;color:#252525}
+.checkoutForm #applyPromo:hover,.checkoutForm .placeOrder:hover{background:#f0e7da}
+.checkoutPage .paymentGuide{background:#303133;border-color:#55575a}
+.checkoutPage .paymentGuide .paymentGuideHead{background:#393a3b;border-bottom-color:#54565a}
+.checkoutPage .paymentGuide .paymentExample{background:#e5dfd6}
+.checkoutPage .orderSummary .sumLine.grand{border-top-color:#66666a}
+@media(max-width:760px){.checkoutPage{background:#2c2e31}}
