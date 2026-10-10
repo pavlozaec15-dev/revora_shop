@@ -10,13 +10,34 @@ const grid=document.querySelector("#products");
 const popular=document.querySelector("#popularProducts");
 function fillHeroWithProductPhotos(){
  const slides=[...document.querySelectorAll('.heroSlide')];
- const withPhotos=HOME_PRODUCTS.filter(p=>p.images?.[0]);
+ const withPhotos=HOME_PRODUCTS.filter(p=>p.images?.some(Boolean));
  if(!withPhotos.length)return;
- const choices=[withPhotos.find(p=>p.category==='Пуховики')||withPhotos[0],withPhotos.find(p=>p.badge==='NEW')||withPhotos[1]||withPhotos[0],withPhotos.find(p=>p.badge==='SALE'||Number(p.old)>Number(p.price))||withPhotos[2]||withPhotos[0]];
+ const usedImages=new Set();
+ const usedProducts=new Set();
+ const preferred=[
+  p=>p.category==='Пуховики',
+  p=>p.badge==='NEW',
+  p=>p.badge==='SALE'||Number(p.old)>Number(p.price)
+ ];
  slides.forEach((slide,i)=>{
-  const visual=slide.querySelector('.heroVisual'),product=choices[i];if(!visual||!product)return;
+  const visual=slide.querySelector('.heroVisual');if(!visual)return;
   if(visual.dataset.customBanner==='true')return;
-  visual.style.backgroundImage='linear-gradient(90deg,rgba(0,0,0,.52),rgba(0,0,0,.2)),url("'+encodeURI(product.images[0]).replace(/["()]/g,'')+'")';
+  const ranked=[...withPhotos.filter(preferred[i]),...withPhotos.filter(p=>!preferred[i](p))];
+  let product,photo;
+  for(const p of ranked){
+   if(usedProducts.has(p.id))continue;
+   const candidate=p.images.find(url=>url&&!usedImages.has(url));
+   if(candidate){product=p;photo=candidate;break}
+  }
+  if(!photo){
+   for(const p of ranked){
+    const candidate=p.images.find(url=>url&&!usedImages.has(url));
+    if(candidate){product=p;photo=candidate;break}
+   }
+  }
+  if(!photo)return;
+  usedImages.add(photo);usedProducts.add(product.id);
+  visual.style.backgroundImage='linear-gradient(90deg,rgba(0,0,0,.52),rgba(0,0,0,.2)),url("'+encodeURI(photo).replace(/["()]/g,'')+'")';
   visual.style.backgroundSize='cover';visual.style.backgroundPosition='center';
   const label=visual.querySelector('span');if(label)label.textContent='REVORA · КОЛЕКЦІЯ';
   const title=visual.querySelector('strong');if(title)title.textContent=product.name;
