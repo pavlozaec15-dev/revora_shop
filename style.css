@@ -279,3 +279,7 @@ header .tools .headerAccount:hover{background:#24211d;border-color:#b99a6c;color
 header .tools .headerAccount:active{background:#2a251e}
 header .tools .headerAccount svg{width:18px;height:18px;stroke-width:1.8}
 @media(max-width:650px){header .tools .headerAccount{width:42px;min-width:42px;height:42px;padding:0;border-radius:50%;gap:0}header .tools .headerAccount svg{width:20px;height:20px}header .tools .headerAccount span{display:none}}
+
+/* Graceful placeholder when a catalogue image fails to load */
+.productImg.imageUnavailable{position:relative;background:linear-gradient(145deg,#e4ded2,#c9c1b2)}
+.productImg.imageUnavailable::after{content:'REVORA';position:absolute;inset:0;display:grid;place-items:center;color:#655b4d;font:600 18px Georgia,serif;letter-spacing:.28em}
