@@ -259,3 +259,10 @@
 .productActions .buyNow small{font-size:10px;letter-spacing:.12em;font-weight:600}
 .productActions .buyNowIcon{font-size:22px;line-height:1}
 @media(max-width:600px){.productActions .buyNow{width:100%;min-height:66px}}
+
+/* REVORA: header My Orders navigation */
+header .tools .headerAccount{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:9px 13px;border:1px solid #a58250;border-radius:8px;background:#241d14;color:#eacb96;text-decoration:none;font-size:11px;font-weight:700;letter-spacing:.045em;white-space:nowrap;transition:background .2s,border-color .2s,transform .2s}
+header .tools .headerAccount:hover{background:#3a2c1a;border-color:#dfb877;transform:translateY(-1px)}
+header .tools .headerAccount:focus-visible{outline:2px solid #eacb96;outline-offset:3px}
+header .tools .headerAccountArrow{font-size:16px}
+@media(max-width:650px){header .tools .headerAccount{padding:9px;gap:5px;font-size:0;min-width:42px}header .tools .headerAccount span:first-child{font-size:19px}header .tools .headerAccountArrow{display:none}}
