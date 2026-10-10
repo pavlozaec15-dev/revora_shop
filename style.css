@@ -537,3 +537,10 @@ footer{background:#26282b;border-color:#4d5053;color:#e8e1d9}footer p{color:#bcb
 .catalogCartButton{background:#383a3d!important;color:#f3eee8!important;border:1px solid #686a6e!important;border-radius:8px!important}
 .catalogCartCount{background:#e2d5c3!important;color:#222!important}
 @media(max-width:760px){.homeHero .heroSlide,.homeHero .heroSlide:nth-child(2),.homeHero .heroSlide:nth-child(3){background:#2e3033}}
+
+/* Product gallery: consistent photo dimensions across different source ratios */
+.productPage .mainPhoto{width:100%;aspect-ratio:4/5;height:auto;overflow:hidden}
+.productPage .mainPhoto #mainProductImage{display:block;width:100%;height:100%;object-fit:contain;object-position:center}
+.productPage .productThumbs button{flex:0 0 86px;width:86px;min-width:86px;height:100px;aspect-ratio:4/5;overflow:hidden;padding:0;display:block}
+.productPage .productThumbs button img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+@media(max-width:560px){.productPage .mainPhoto{aspect-ratio:4/5;height:auto}.productPage .productThumbs button{flex-basis:72px;width:72px;min-width:72px;height:90px}}
