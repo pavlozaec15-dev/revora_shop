@@ -312,3 +312,10 @@ header .tools .headerAccount svg{width:18px;height:18px;stroke-width:1.8}
 .revoraCatalogBar>span{font-size:11px;letter-spacing:.16em;opacity:.7}
 .revoraCatalogBar .filterToggle{margin:0}
 @media(max-width:650px){.revoraBrowse{padding:20px 16px;margin:4px 0 18px}.revoraBrowseTitle strong{font-size:21px}.revoraTabs button{padding:10px 14px}.revoraCatalogBar>span{font-size:9px}}
+
+/* Clean premium catalogue header: no promo panels or duplicate category buttons */
+.catalogPage .revoraCatalogBar{padding:18px 0 22px;margin:0 0 18px;border-bottom:1px solid #a99a8255;align-items:end}
+.revoraCatalogHeading span{display:block;font:600 10px system-ui;letter-spacing:.22em;color:#9a825c;margin-bottom:7px}
+.revoraCatalogHeading h2{margin:0;font:normal clamp(24px,3vw,36px) Georgia,serif;letter-spacing:-.025em}
+.revoraCatalogBar .filterToggle{flex:0 0 auto}
+@media(max-width:650px){.catalogPage .revoraCatalogBar{padding:10px 0 16px}.revoraCatalogHeading h2{font-size:25px}}
