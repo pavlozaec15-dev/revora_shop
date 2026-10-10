@@ -551,3 +551,5 @@ footer{background:#26282b;border-color:#4d5053;color:#e8e1d9}footer p{color:#bcb
 .colorOptions{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0 22px}.colorOptions button{border:1px solid #aaa29a;background:transparent;color:inherit;border-radius:6px;padding:10px 14px;cursor:pointer;font-size:13px}.colorOptions button.selected{border:2px solid #bd9a5c;background:#bd9a5c22;font-weight:700}
 
 .sizeGuideScroll{max-width:100%;overflow-x:auto}.sizeGuideScroll table{min-width:360px;width:100%;border-collapse:collapse}.sizeGuideScroll th,.sizeGuideScroll td{padding:12px 10px;text-align:left;white-space:nowrap;border-bottom:1px solid #c9c0b4}.sizeGuideScroll th{font-weight:700}
+
+.activeFilters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.activeFilters:empty{display:none}.activeFilters button{background:#29231c;color:#f2d9a9;border:1px solid #977747;border-radius:30px;padding:8px 12px;cursor:pointer;font-size:12px}.activeFilters button:hover{background:#493723}
