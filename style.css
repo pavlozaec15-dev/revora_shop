@@ -331,3 +331,10 @@ header .tools .catalogCartCount{position:absolute;top:-6px;right:-7px;min-width:
 .cartProductPhoto img{width:100%;height:100%;display:block;object-fit:cover}
 .cartProductPhoto span{display:grid;place-items:center;width:100%;height:100%}
 .cartProductInfo>a b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:12px;line-height:1.4}
+
+/* REVORA cart: large, properly proportioned product photos */
+.drawer .cartProduct{grid-template-columns:112px minmax(0,1fr) auto;gap:15px;align-items:start;padding:20px 0}
+.drawer .cartProductPhoto{width:112px;height:142px;min-height:142px;aspect-ratio:112/142;border-radius:9px;background:#e9e5de;display:block;overflow:hidden}
+.drawer .cartProductPhoto img{display:block;width:100%;height:100%;object-fit:contain;object-position:center;background:#eeeae3}
+.drawer .cartProductInfo>a b{font-size:13px;line-height:1.45}
+@media(max-width:650px){.drawer .cartProduct{grid-template-columns:96px minmax(0,1fr) auto;gap:10px}.drawer .cartProductPhoto{width:96px;height:124px;min-height:124px}}
