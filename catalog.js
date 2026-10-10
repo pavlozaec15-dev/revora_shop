@@ -18,6 +18,7 @@ async function loadPublicProducts(){
       price:Number(p.price),old:p.old_price==null?null:Number(p.old_price),
       sizes:p.sizes||[],images:p.image_urls||[],badge:p.badge||''
     }));
+    renderCart();
     return;
   }catch(error){console.warn('Supabase public catalogue failed, trying Cloudflare',error)}
   try{
@@ -25,6 +26,7 @@ async function loadPublicProducts(){
     const data=await response.json();
     if(!response.ok||!data.ok||!Array.isArray(data.products))throw Error('Cloudflare catalogue HTTP '+response.status);
     P=data.products;
+    renderCart();
   }catch(error){
     console.error('REVORA LIVE CATALOGUE NOT AVAILABLE',error);
     const grid=document.querySelector('#catalogGrid');
