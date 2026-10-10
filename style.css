@@ -384,3 +384,41 @@ header .tools .catalogCartCount{position:absolute;top:-6px;right:-7px;min-width:
 .paymentGuide .paymentGuideFoot>span{font-size:17px;color:#c9aa7d;line-height:1.2}
 .paymentGuide .paymentGuideFoot p{margin:0!important;font-size:11px!important;line-height:1.65!important;color:#aaa297!important}
 @media(max-width:600px){.paymentGuide .paymentGuideHead{padding:17px}.paymentGuide .paymentGuideHead h3{font-size:19px}.paymentGuide .paymentSteps{padding:6px 17px}.paymentGuide .paymentExample{margin:7px 17px 0;padding:15px}.paymentGuide .paymentGuideFoot{padding:15px 17px 18px}.paymentGuide .paymentExampleTotal strong{font-size:20px}}
+
+/* REVORA checkout — complete cohesive redesign */
+.checkoutPage{background:linear-gradient(180deg,#f5f2ed 0%,#ece7df 100%);color:#24211d;padding:36px clamp(16px,5vw,90px) 110px}
+.checkoutTitle{max-width:1250px;margin:0 auto 34px}
+.checkoutBreadcrumb{display:flex;gap:9px;align-items:center;margin-bottom:25px;font-size:12px;color:#8a8176}
+.checkoutBreadcrumb a{color:#756b60;text-decoration:none}.checkoutBreadcrumb a:hover{color:#a1793f}
+.checkoutKicker{font-size:11px;font-weight:700;letter-spacing:.22em;color:#9c7b4d}
+.checkoutTitle h1{font:500 clamp(35px,5vw,58px)/1.13 Georgia,serif;letter-spacing:-.035em;margin:10px 0 12px}
+.checkoutTitle p{font-size:14px;line-height:1.6;color:#756d63;margin:0}
+.checkoutLayout{max-width:1250px;margin:0 auto;grid-template-columns:minmax(0,1.45fr) minmax(320px,.85fr);gap:26px;align-items:start}
+.checkoutForm{padding:clamp(20px,3vw,38px);background:#fff;border:1px solid #e4ddd3;border-radius:16px;box-shadow:0 12px 45px #372a1b0b}
+.checkoutForm h2{font:600 19px Arial,sans-serif;letter-spacing:-.02em;margin:34px 0 19px;padding:0 0 14px;border-bottom:1px solid #eee9e1;color:#29251f}
+.checkoutForm h2:first-child{margin-top:0}
+.checkoutForm label{font-size:12px;font-weight:600;letter-spacing:0;color:#51493f;gap:9px;margin-bottom:17px}
+.checkoutForm input:not([type=radio]),.checkoutForm select,.checkoutForm textarea{min-height:48px;padding:13px 15px;background:#faf9f6;border:1px solid #d9d1c5;border-radius:9px;font:14px Arial,sans-serif;color:#2d2821;transition:background .2s,border-color .2s,box-shadow .2s}
+.checkoutForm input:not([type=radio]):focus,.checkoutForm select:focus,.checkoutForm textarea:focus{background:#fff;border-color:#b48d58;box-shadow:0 0 0 3px #b48d581b;outline:none}
+.checkoutForm input::placeholder,.checkoutForm textarea::placeholder{color:#9b9389}
+.checkoutForm .formHint{color:#80776c;font-size:12px;line-height:1.6;margin:7px 0 15px}
+.checkoutForm #applyPromo{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:12px 19px;background:#29251f;color:#fff;border:0;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:.07em;cursor:pointer;transition:background .2s}
+.checkoutForm #applyPromo:hover{background:#755b37}
+.checkoutForm .payments{gap:10px;margin:0 0 20px}
+.checkoutForm .payments label{display:flex;align-items:center;gap:10px;padding:15px;border:1px solid #ddd5c9;border-radius:10px;background:#faf9f6;font-size:12px;line-height:1.5;font-weight:500;margin:0}
+.checkoutForm .payments label:has(input:checked){background:#f7f1e7;border-color:#b99462}
+.checkoutForm .payments label:has(input:disabled){opacity:.52;cursor:not-allowed}
+.checkoutForm .payments input{width:16px;height:16px;flex:none;accent-color:#8f6b39;margin:0}
+.checkoutForm .paymentGuide{margin:18px 0 26px}
+.checkoutForm .placeOrder{background:#181715;border-radius:10px;min-height:56px;font-weight:700;font-size:12px;letter-spacing:.09em;box-shadow:none;transition:background .2s,transform .2s}
+.checkoutForm .placeOrder:hover{background:#927044;opacity:1}
+.checkoutForm .checkoutSecure{color:#8b8176;text-align:center;font-size:11px;line-height:1.6;margin:13px 0 0}
+.checkoutPage .orderSummary{position:sticky;top:110px;background:#fff;border:1px solid #e4ddd3;border-radius:16px;padding:28px;box-shadow:0 12px 45px #372a1b0b;overflow:hidden}
+.checkoutPage .orderSummary>small{color:#a1855f;font-size:10px;font-weight:700;letter-spacing:.18em}
+.checkoutPage .orderSummary h2{font:500 26px Georgia,serif;margin:10px 0 17px;padding-bottom:17px;border-bottom:1px solid #eee9e1}
+.checkoutPage .checkoutItem{border-bottom:1px solid #eee9e1}
+.checkoutPage .checkoutItem img{border-radius:7px}
+.checkoutPage .orderSummary .sumLine{padding:9px 0}
+.checkoutPage .orderSummary .sumLine.grand{padding-top:17px;border-top:1px solid #e5ded3;margin-top:8px}
+@media(max-width:950px){.checkoutLayout{grid-template-columns:minmax(0,1fr) 320px;gap:16px}.checkoutPage .orderSummary{padding:20px}}
+@media(max-width:760px){.checkoutPage{padding:22px 15px 80px}.checkoutTitle{margin-bottom:22px}.checkoutBreadcrumb{margin-bottom:19px}.checkoutTitle h1{font-size:36px}.checkoutTitle p{font-size:12px}.checkoutLayout{grid-template-columns:minmax(0,1fr);gap:16px}.checkoutPage .orderSummary{position:static;order:-1;padding:20px}.checkoutForm{padding:21px 17px}.checkoutForm h2{font-size:18px}.checkoutForm .placeOrder{position:static;box-shadow:none}.formGrid{grid-template-columns:1fr}}
