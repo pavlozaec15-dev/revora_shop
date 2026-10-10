@@ -266,3 +266,9 @@ header .tools .headerAccount:hover{background:#3a2c1a;border-color:#dfb877;trans
 header .tools .headerAccount:focus-visible{outline:2px solid #eacb96;outline-offset:3px}
 header .tools .headerAccountArrow{font-size:16px}
 @media(max-width:650px){header .tools .headerAccount{padding:9px;gap:5px;font-size:0;min-width:42px}header .tools .headerAccount span:first-child{font-size:19px}header .tools .headerAccountArrow{display:none}}
+
+/* Minimal orders navigation: replaces previous gold style */
+header .tools .headerAccount{background:transparent;color:#f4f1e9;border:1px solid #343434;border-radius:6px;padding:9px 12px;gap:8px;box-shadow:none;min-height:40px;font-size:11px;font-weight:600;letter-spacing:.06em;transform:none}
+header .tools .headerAccount:hover{background:#1b1b1b;color:#e6c48c;border-color:#766347;transform:none}
+header .tools .headerAccount svg{width:19px;height:19px;flex:none}
+@media(max-width:650px){header .tools .headerAccount{padding:9px;min-width:40px}header .tools .headerAccount span{display:none}header .tools .headerAccount svg{width:20px;height:20px}}
