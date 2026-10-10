@@ -523,3 +523,17 @@ footer{background:#26282b;border-color:#4d5053;color:#e8e1d9}footer p{color:#bcb
 .catalogPage h1,.productPage h1,.catalogMain h1,.productMain h1{color:var(--rv-text)}
 .catalogPage select,.catalogPage input,.catalogMain select,.catalogMain input{background:#383a3d;color:#f3eee8;border-color:#62656a}
 @media(max-width:760px){.hero{background:linear-gradient(150deg,#35373a,#292b2e)}.section.light,.light{background:#343639}.product{border-radius:9px}.product:hover{transform:none}}
+
+/* Consistent hero banners and universal neutral buttons */
+.homeHero .heroSlide,.homeHero .heroSlide:nth-child(2),.homeHero .heroSlide:nth-child(3){background:radial-gradient(circle at 76% 40%,#454649 0%,#343639 42%,#292b2e 88%)}
+.homeHero .heroSlide .heroCopy h1,.homeHero .heroSlide .heroCopy p{color:#f2eee8}
+.homeHero .heroSlide .heroVisual{background-color:#3c3e40;border-color:#696b6d;transform:none;border-radius:13px}
+.homeHero .heroSlide .heroVisual:before{border-color:#ffffff30}
+.homeHero .heroSlide .heroVisual span,.homeHero .heroSlide .heroVisual small{color:#e2d5c3;text-shadow:0 1px 5px #000a}
+.homeHero .heroControls button,.primary,.add,.placeOrder,#applyPromo,.homeSearchAll,.catalogAdd,.buyButton,button[type=submit]:not(.mobile):not(.catalogCartButton){background:#e2d5c3;color:#26272a;border-color:#e2d5c3;border-radius:8px}
+.homeHero .heroControls button:hover,.primary:hover,.add:hover,.placeOrder:hover,#applyPromo:hover,.catalogAdd:hover,.buyButton:hover,button[type=submit]:not(.mobile):not(.catalogCartButton):hover{background:#f0e7da;color:#202124}
+.ghost,.homeHero .heroBtns .ghost{background:#3b3d40;color:#f2eee8;border:1px solid #77787b;border-radius:8px}
+.ghost:hover,.homeHero .heroBtns .ghost:hover{background:#4b4d50}
+.catalogCartButton{background:#383a3d!important;color:#f3eee8!important;border:1px solid #686a6e!important;border-radius:8px!important}
+.catalogCartCount{background:#e2d5c3!important;color:#222!important}
+@media(max-width:760px){.homeHero .heroSlide,.homeHero .heroSlide:nth-child(2),.homeHero .heroSlide:nth-child(3){background:#2e3033}}
