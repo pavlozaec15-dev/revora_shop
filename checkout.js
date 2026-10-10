@@ -741,8 +741,8 @@ form.onsubmit =
 
     // Validate contact phone before sending an order to the manager.
     const phoneField = form.querySelector('[name="phone"]');
-    const digits = (phoneField?.value || "").replace(/\\D/g, "");
-    const validPhone = /^0\\d{9}$/.test(digits) || /^380\\d{9}$/.test(digits);
+    const digits = (phoneField?.value || "").replace(/\D/g, "");
+    const validPhone = /^0\d{9}$/.test(digits) || /^380\d{9}$/.test(digits);
     if (!validPhone) {
       phoneField.setCustomValidity("Введіть український номер: 0XXXXXXXXX або +380XXXXXXXXX");
       phoneField.reportValidity();
