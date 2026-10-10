@@ -338,3 +338,24 @@ header .tools .catalogCartCount{position:absolute;top:-6px;right:-7px;min-width:
 .drawer .cartProductPhoto img{display:block;width:100%;height:100%;object-fit:contain;object-position:center;background:#eeeae3}
 .drawer .cartProductInfo>a b{font-size:13px;line-height:1.45}
 @media(max-width:650px){.drawer .cartProduct{grid-template-columns:96px minmax(0,1fr) auto;gap:10px}.drawer .cartProductPhoto{width:96px;height:124px;min-height:124px}}
+
+/* REVORA payment guide — structured checkout flow */
+.paymentGuide{margin:22px 0 26px;background:#171717;border:1px solid #49433a;border-radius:16px;overflow:hidden;color:#f3ede4}
+.paymentGuideHead{display:flex;align-items:center;gap:15px;padding:22px 24px;background:linear-gradient(110deg,#29231b,#171717);border-bottom:1px solid #49433a}
+.paymentGuideIcon{width:44px;height:44px;flex:none;display:grid;place-items:center;background:#d2ae76;color:#15120e;border-radius:12px;font:bold 25px Georgia,serif}
+.paymentGuideEyebrow{display:block;color:#c8ad86;font-size:10px;letter-spacing:.17em;margin-bottom:4px}
+.paymentGuideHead h3{margin:0;color:#fff;font:normal 23px Georgia,serif}
+.paymentSteps{padding:10px 24px 8px}
+.paymentStep{display:flex;gap:17px;padding:17px 0;border-bottom:1px solid #ffffff15;align-items:flex-start}
+.paymentStep:last-child{border-bottom:0}
+.paymentStepNo{flex:none;display:grid;place-items:center;width:34px;height:34px;border:1px solid #b99b70;border-radius:50%;color:#d9bd94;font:600 12px Arial,sans-serif}
+.paymentStep b{font-size:14px;color:#f5f0e7}
+.paymentStep p{margin:5px 0 0!important;color:#bbb4a9!important;font-size:13px!important;line-height:1.5}
+.paymentExample{margin:8px 24px 18px;padding:17px 20px;border-radius:11px;background:#eee7db;color:#24201b}
+.paymentExample>span{display:block;color:#85745e;font-size:10px;letter-spacing:.13em;font-weight:700;margin-bottom:14px}
+.paymentExample>div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:13px}
+.paymentExample b{font-size:14px}
+.paymentExample .paymentExampleTotal{border-top:1px solid #c8bdad;margin-top:7px;padding-top:14px;font-weight:700;align-items:center}
+.paymentExampleTotal strong{font-size:21px;color:#201b14}
+.paymentGuideFoot{margin:0!important;padding:0 24px 22px;color:#aaa296!important;font-size:12px!important;line-height:1.65!important}
+@media(max-width:600px){.paymentGuideHead{padding:17px}.paymentGuideHead h3{font-size:20px}.paymentSteps{padding:8px 17px}.paymentExample{margin:8px 17px 16px;padding:15px}.paymentGuideFoot{padding:0 17px 19px}}
