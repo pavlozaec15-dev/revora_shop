@@ -39,10 +39,17 @@ function renderStats(){
  const counts={all:rows.length,new:0,shipped:0,completed:0,cancelled:0};
  for(const o of rows)if(Object.hasOwn(counts,o.status))counts[o.status]++;
  const revenue=rows.filter(o=>o.status!=='cancelled').reduce((sum,o)=>sum+Number(o.total_amount||0),0);
- const cards=[['Усі замовлення',counts.all],['Нові',counts.new],['Відправлені',counts.shipped],['Завершені',counts.completed],['Скасовані',counts.cancelled],['Сума без скасованих',money(revenue)]];
+ const paymentCounts={pending:0,paid:0,refunded:0};
+ const paymentAmounts={pending:0,paid:0,refunded:0};
+ for(const o of rows){
+  const paymentStatus=['pending','paid','refunded'].includes(o.payment_status)?o.payment_status:'pending';
+  paymentCounts[paymentStatus]++;
+  paymentAmounts[paymentStatus]+=Number(o.total_amount||0);
+ }
+ const cards=[['Усі замовлення',counts.all],['Нові',counts.new],['Відправлені',counts.shipped],['Завершені',counts.completed],['Скасовані',counts.cancelled],['Сума без скасованих',money(revenue)],['Очікують оплати',paymentCounts.pending],['Сума очікуваних оплат',money(paymentAmounts.pending)],['Позначені оплаченими',paymentCounts.paid],['Сума позначених оплат',money(paymentAmounts.paid)],['Позначені поверненими',paymentCounts.refunded],['Сума позначених повернень',money(paymentAmounts.refunded)]];
  const holder=$('managerStats');holder.replaceChildren();
  for(const [title,value] of cards){const card=document.createElement('div');card.className='stat';const label=document.createElement('small');label.textContent=title;const number=document.createElement('strong');number.textContent=String(value);card.append(label,number);holder.append(card)}
- $('statsHint').textContent=allOrders.length===200?'Увага: статистика охоплює лише 200 останніх замовлень.':'Сума замовлень не дорівнює підтвердженому прибутку.';
+ $('statsHint').textContent=allOrders.length===200?'Увага: статистика охоплює лише 200 останніх замовлень.':'Статистика оплат базується на ручних позначках менеджера, а не на банківських транзакціях. Суми включають усі замовлення відповідного статусу, навіть скасовані.';
 }
 function renderOrders(){
 const query=$('orderSearch').value.trim().toLocaleLowerCase('uk-UA');
