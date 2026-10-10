@@ -359,3 +359,28 @@ header .tools .catalogCartCount{position:absolute;top:-6px;right:-7px;min-width:
 .paymentExampleTotal strong{font-size:21px;color:#201b14}
 .paymentGuideFoot{margin:0!important;padding:0 24px 22px;color:#aaa296!important;font-size:12px!important;line-height:1.65!important}
 @media(max-width:600px){.paymentGuideHead{padding:17px}.paymentGuideHead h3{font-size:20px}.paymentSteps{padding:8px 17px}.paymentExample{margin:8px 17px 16px;padding:15px}.paymentGuideFoot{padding:0 17px 19px}}
+
+/* Payment guide v2: clean, compact, aligned typography and numbers */
+.checkoutPage .paymentGuide,.paymentGuide{background:#151515;border:1px solid #3e3b35;border-radius:14px;box-shadow:none;max-width:100%}
+.paymentGuide .paymentGuideHead{padding:20px 22px;display:flex;justify-content:space-between;align-items:center;gap:15px;background:#1d1b18;border-bottom:1px solid #38342e}
+.paymentGuide .paymentGuideEyebrow{font:700 10px Arial,sans-serif;letter-spacing:.16em;color:#c9aa7d}
+.paymentGuide .paymentGuideHead h3{font:500 22px Arial,sans-serif;letter-spacing:-.025em;margin:4px 0 0;color:#f7f4ee}
+.paymentGuide .paymentGuideIcon{width:38px;height:38px;border-radius:50%;font-size:22px}
+.paymentGuide .paymentSteps{list-style:none;margin:0;padding:8px 22px}
+.paymentGuide .paymentStep{display:grid;grid-template-columns:28px minmax(0,1fr);align-items:start;gap:13px;padding:16px 0;border-bottom:1px solid #ffffff13}
+.paymentGuide .paymentStep:last-child{border-bottom:0}
+.paymentGuide .paymentStepNo{width:28px;height:28px;border-radius:8px;background:#30281f;color:#e8c99b;border:0;font-size:12px}
+.paymentGuide .paymentStep b{display:block;font-size:14px;font-weight:700;color:#f2eee7}
+.paymentGuide .paymentStep p{margin:4px 0 0!important;color:#bcb5aa!important;font-size:12px!important;line-height:1.5!important}
+.paymentGuide .paymentAmount{color:#dfb979}
+.paymentGuide .paymentExample{margin:8px 22px 0;padding:16px 18px;background:#ece7dd;color:#211e19;border-radius:10px}
+.paymentGuide .paymentExampleTitle{font-size:10px;font-weight:700;letter-spacing:.11em;color:#756c5e;margin-bottom:9px}
+.paymentGuide .paymentExampleLine,.paymentGuide .paymentExampleTotal{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0;font-size:13px}
+.paymentGuide .paymentExampleLine b{white-space:nowrap;font-size:14px}
+.paymentGuide .paymentExampleTotal{border-top:1px solid #c9c0b3;margin-top:3px;padding:13px 0 6px;font-weight:700}
+.paymentGuide .paymentExampleTotal strong{font-size:22px;white-space:nowrap}
+.paymentGuide .paymentExample>small{display:block;color:#756c5e;font-size:11px;margin-top:4px}
+.paymentGuide .paymentGuideFoot{display:flex;gap:9px;align-items:flex-start;padding:16px 22px 20px;margin:0!important;color:#aaa297}
+.paymentGuide .paymentGuideFoot>span{font-size:17px;color:#c9aa7d;line-height:1.2}
+.paymentGuide .paymentGuideFoot p{margin:0!important;font-size:11px!important;line-height:1.65!important;color:#aaa297!important}
+@media(max-width:600px){.paymentGuide .paymentGuideHead{padding:17px}.paymentGuide .paymentGuideHead h3{font-size:19px}.paymentGuide .paymentSteps{padding:6px 17px}.paymentGuide .paymentExample{margin:7px 17px 0;padding:15px}.paymentGuide .paymentGuideFoot{padding:15px 17px 18px}.paymentGuide .paymentExampleTotal strong{font-size:20px}}
