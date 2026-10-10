@@ -147,9 +147,14 @@ function renderCheckout() {
 
     ${discount ? '<div class="sumLine"><span>Знижка '+appliedPromo.code+'</span><b>−'+cMoney(discount)+'</b></div>' : ''}
     <div class="sumLine grand">
-      <span>Разом</span>
+      <span>Сума товарів до оплати при отриманні</span>
       <b>${cMoney(subtotal-discount)}</b>
     </div>
+    <div class="sumLine" style="font-size:13px;opacity:.85">
+      <span>Планована додаткова плата за післяплату (зараз не стягується)</span>
+      <b>200 ₴</b>
+    </div>
+    <p class="formHint">За майбутньої схеми післяплати загальна сума становитиме ${cMoney(subtotal-discount+200)} (без вартості доставки). Зараз оплата на сайті не проводиться, додаткові 200 грн не нараховуються до цього замовлення.</p>
   `;
 
   items
