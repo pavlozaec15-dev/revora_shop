@@ -43,6 +43,18 @@ async function loadCheckoutSettings(){
 
 
 
+async function restoreCheckoutPhotos(){
+ if(!checkoutCart.some(x=>!x.image))return;
+ try{
+  const response=await fetch('https://mqsytqicykgtbjjvaroa.supabase.co/rest/v1/products?published=eq.true&select=id,image_urls&limit=300',{headers:{apikey:'sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH'},cache:'no-store'});
+  if(!response.ok)return;
+  const products=await response.json();
+  let changed=false;
+  checkoutCart.forEach(x=>{if(x.image)return;const p=products.find(p=>String(p.id)===String(x.id));if(p?.image_urls?.[0]){x.image=p.image_urls[0];changed=true}});
+  if(changed){localStorage.setItem('revoraCartItems',JSON.stringify(checkoutCart));renderCheckout()}
+ }catch(error){console.warn('Cannot restore checkout photos',error)}
+}
+
 /* =========================
    КОШИК
 ========================= */
@@ -912,4 +924,5 @@ form.onsubmit =
   };
 
 renderCheckout();
+restoreCheckoutPhotos();
 loadCheckoutSettings();
