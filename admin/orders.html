@@ -8,6 +8,7 @@
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 const sb=createClient('https://mqsytqicykgtbjjvaroa.supabase.co','sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH',{auth:{flowType:'pkce',detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
 const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>Number(n||0).toLocaleString('uk-UA')+' ₴';
 const names={new:'Нове',confirmed:'Підтверджено',shipped:'Відправлено',completed:'Завершено',cancelled:'Скасовано'};
 let selected=null,canDelete=false,allOrders=[],seenOrderIds=null,checkTimer=null,loading=false;
@@ -68,7 +69,7 @@ visible.sort((a,b)=>sort==='expensive'?Number(b.total_amount||0)-Number(a.total_
 $('notice').textContent='Показано '+visible.length+' із '+allOrders.length+' замовлень';
 $('orders').replaceChildren();
 if(!visible.length){$('orders').textContent=allOrders.length?'За цим пошуком замовлень немає.':'Замовлень поки немає.';return}
-visible.forEach(o=>{const row=document.createElement('div');row.className='row';const info=document.createElement('div');const name=document.createElement('b');name.textContent=o.number;const sub=document.createElement('small');sub.textContent=o.customer_name+' · '+money(o.total_amount)+' · '+(names[o.status]||o.status)+' · '+({pending:'🟡 Очікує оплати',paid:'🟢 Оплачено',refunded:'🔵 Повернено'}[o.payment_status||'pending']);info.append(name,sub);const btn=document.createElement('button');btn.textContent='ВІДКРИТИ';btn.onclick=()=>openOrder(o);row.append(info,btn);$('orders').append(row)});
+visible.forEach(o=>{const row=document.createElement('div');row.className='row';const info=document.createElement('div');const name=document.createElement('b');name.textContent=o.number;const date=document.createElement('small');date.textContent=new Date(o.created_at).toLocaleString('uk-UA');const sub=document.createElement('small');sub.textContent=o.customer_name+' · '+money(o.total_amount)+' · '+(names[o.status]||o.status)+' · '+({pending:'🟡 Очікує оплати',paid:'🟢 Оплачено',refunded:'🔵 Повернено'}[o.payment_status||'pending']);info.append(name,date,sub);const btn=document.createElement('button');btn.textContent='ВІДКРИТИ';btn.onclick=()=>openOrder(o);row.append(info,btn);$('orders').append(row)});
 }
 $('deleteOrder').onclick=async()=>{
  if(!canDelete||!selected)return;
