@@ -51,7 +51,7 @@ async function handler(req, res, env) {
     if (!Array.isArray(order.items) || !order.items.length || order.items.length > 50) throw new Error('Invalid cart');
     const items = order.items.map(item => {
       const product = currentCatalog.find(p => p.id === item?.id);
-      if (!product || !product.sizes.includes(item.size) || !Number.isInteger(item.qty) || item.qty < 1 || item.qty > 20) throw new Error('Invalid cart item');
+      if (!product || (product.sizes.length ? !product.sizes.includes(item.size) : Boolean(item.size)) || !Number.isInteger(item.qty) || item.qty < 1 || item.qty > 20) throw new Error('Invalid cart item');
       return { id: product.id, name: product.name, size: item.size, qty: item.qty, price: product.price };
     });
     if (!['branch', 'locker'].includes(customer.delivery) || customer.payment !== 'cod') throw new Error('Invalid delivery or unsupported payment');
