@@ -293,3 +293,8 @@ header .tools .headerAccount svg{width:18px;height:18px;stroke-width:1.8}
 .product .productLink:focus-visible,.product .quickAdd:focus-visible{outline:2px solid #d4b17a;outline-offset:-2px}
 @media(hover:none){.product:hover{transform:none;box-shadow:none}.product:hover .productImg img{transform:none}}
 @media(prefers-reduced-motion:reduce){.product,.productImg img{transition:none}.product:hover,.product:hover .productImg img{transform:none}}
+
+/* Empty catalogue: clear recovery action */
+.noProducts .emptyReset{margin-top:18px;padding:12px 20px;background:#d7b784;color:#111;border:1px solid #d7b784;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:background .2s,border-color .2s}
+.noProducts .emptyReset:hover{background:#f0d4a7;border-color:#f0d4a7}
+.noProducts .emptyReset:focus-visible{outline:2px solid #d7b784;outline-offset:3px}
