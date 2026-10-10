@@ -37,7 +37,9 @@ const {data,error}=await sb.from('orders').select('id,number,customer_name,custo
 if(error){if(!silent)$('notice').textContent='Помилка завантаження: '+error.message;loading=false;return}
 const incoming=data||[];const ids=new Set(incoming.map(o=>String(o.id)));
 if(seenOrderIds!==null){const added=incoming.filter(o=>!seenOrderIds.has(String(o.id)));if(added.length){$('alertHint').textContent='🔔 Нових замовлень: '+added.length+'!';if('Notification' in window&&Notification.permission==='granted'){try{const n=new Notification('REVORA — нове замовлення',{body:added.length===1?'Надійшло нове замовлення':'Нових замовлень: '+added.length,tag:'revora-new-orders'});n.onclick=()=>{window.focus();$('quickNew').click();n.close()}}catch(e){$('alertHint').textContent+=' (сповіщення браузера недоступне)'}}}}
-seenOrderIds=ids;allOrders=incoming;renderOrders();renderStats();if(selected&&!silent){const latest=allOrders.find(o=>String(o.id)===String(selected.id));if(latest){const previousScroll=window.scrollY;openOrder(latest,false);window.scrollTo(0,previousScroll)}else{$('detail').hidden=true;selected=null}}loading=false;
+seenOrderIds=ids;allOrders=incoming;renderOrders();renderStats();
+const requestedOrder=new URLSearchParams(location.search).get('order');
+if(requestedOrder){const target=allOrders.find(o=>String(o.number)===requestedOrder);if(target){$('orderSearch').value=requestedOrder;renderOrders();openOrder(target);history.replaceState(null,'',location.pathname)}else{$('notice').textContent='Замовлення '+requestedOrder+' не знайдено.';history.replaceState(null,'',location.pathname)}}if(selected&&!silent){const latest=allOrders.find(o=>String(o.id)===String(selected.id));if(latest){const previousScroll=window.scrollY;openOrder(latest,false);window.scrollTo(0,previousScroll)}else{$('detail').hidden=true;selected=null}}loading=false;
 }
 function renderStats(){
  const period=$('statsPeriod').value,now=new Date(),start=new Date(now);
