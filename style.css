@@ -249,3 +249,13 @@
 #fav{display:none}
 @media(max-width:560px){.editorial a{grid-template-columns:36px 1fr 26px}.editorial a h3{font-size:24px}.homeSearchOverlay{padding-top:9vh}.homeSearchDialog{padding:20px}.tools #search{display:block}.heroVisual strong{font-size:37px}}
 @media(prefers-reduced-motion:reduce){.heroSlide,.heroVisual,.drawer{transition:none!important}#intro{display:none}}
+
+/* REVORA: prominent quick-order button on product page */
+.productActions .buyNow{display:flex;align-items:center;justify-content:center;gap:12px;min-height:64px;padding:12px 22px;border:1px solid #bd9558;border-radius:10px;background:linear-gradient(135deg,#d9b981,#b98c4b);color:#15110c;font-weight:800;letter-spacing:.04em;cursor:pointer;box-shadow:0 8px 24px #8b652b38;transition:transform .2s,box-shadow .2s,filter .2s}
+.productActions .buyNow:hover{transform:translateY(-2px);box-shadow:0 12px 30px #8b652b55;filter:brightness(1.06)}
+.productActions .buyNow:active{transform:translateY(0)}
+.productActions .buyNow:focus-visible{outline:3px solid #8b6a34;outline-offset:3px}
+.productActions .buyNow span:last-child{display:flex;flex-direction:column;align-items:center;gap:3px}
+.productActions .buyNow small{font-size:10px;letter-spacing:.12em;font-weight:600}
+.productActions .buyNowIcon{font-size:22px;line-height:1}
+@media(max-width:600px){.productActions .buyNow{width:100%;min-height:66px}}
