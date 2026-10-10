@@ -2,7 +2,7 @@ async function getOrderCatalog(env) {
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY)
     throw new Error('Supabase configuration is missing');
   // Always validate against published live products: static seed prices can be stale.
-  const endpoint = env.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/products?published=eq.true&select=id,name,price,sizes&limit=500';
+  const endpoint = env.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/products?published=eq.true&select=id,name,price,sizes,colors&limit=500';
   const response = await fetch(endpoint, {
     headers: { apikey: 'sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH' },
     signal: AbortSignal.timeout(10000)
@@ -10,7 +10,7 @@ async function getOrderCatalog(env) {
   if (!response.ok) throw new Error('Product validation unavailable: ' + response.status);
   const active = await response.json();
   if (!Array.isArray(active)) throw new Error('Invalid live catalogue');
-  return active.map(x => ({ id:x.id, name:x.name, price:Number(x.price), sizes:x.sizes||[] }));
+  return active.map(x => ({ id:x.id, name:x.name, price:Number(x.price), sizes:x.sizes||[], colors:x.colors||[] }));
 }
 
 async function readStoreSettings(env) {
@@ -51,8 +51,8 @@ async function handler(req, res, env) {
     if (!Array.isArray(order.items) || !order.items.length || order.items.length > 50) throw new Error('Invalid cart');
     const items = order.items.map(item => {
       const product = currentCatalog.find(p => p.id === item?.id);
-      if (!product || (product.sizes.length ? !product.sizes.includes(item.size) : Boolean(item.size)) || !Number.isInteger(item.qty) || item.qty < 1 || item.qty > 20) throw new Error('Invalid cart item');
-      return { id: product.id, name: product.name, size: item.size, qty: item.qty, price: product.price };
+      if (!product || (product.sizes.length ? !product.sizes.includes(item.size) : Boolean(item.size)) || (product.colors.length ? !product.colors.includes(item.color) : Boolean(item.color)) || !Number.isInteger(item.qty) || item.qty < 1 || item.qty > 20) throw new Error('Invalid cart item');
+      return { id: product.id, name: product.name, size: item.size, color: item.color||"", qty: item.qty, price: product.price };
     });
     if (!['branch', 'locker'].includes(customer.delivery) || customer.payment !== 'cod') throw new Error('Invalid delivery or unsupported payment');
     const phone = text(customer.phone, 40);
@@ -127,7 +127,7 @@ async function handler(req, res, env) {
   const chatId = env.TELEGRAM_CHAT_ID;
   if (inserted && token && chatId && storeSettings.telegram_enabled==='true') {
     try {
-      const message = `🛍 НОВЕ ЗАМОВЛЕННЯ REVORA\n№ ${record.number}\n\n${record.customer_name}\n${record.customer_phone}\n${record.delivery_city}, ${record.delivery_branch}\nДоставка: ${record.delivery_type === 'locker' ? 'Поштомат' : 'Відділення'}\nОплата: Післяплата\n\n${record.items.map(i => `${i.name} · ${i.size} · ${i.qty} шт. · ${i.price} грн`).join('\n')}\n\nРазом: ${record.total_amount} грн${promoCode ? `\nПромокод: ${promoCode} (−${promoDiscount} грн)` : ''}\nКоментар: ${record.notes || 'Немає'}`;
+      const message = `🛍 НОВЕ ЗАМОВЛЕННЯ REVORA\n№ ${record.number}\n\n${record.customer_name}\n${record.customer_phone}\n${record.delivery_city}, ${record.delivery_branch}\nДоставка: ${record.delivery_type === 'locker' ? 'Поштомат' : 'Відділення'}\nОплата: Післяплата\n\n${record.items.map(i => `${i.name} · ${i.size||"Без розміру"}${i.color?" · "+i.color:""} · ${i.qty} шт. · ${i.price} грн`).join('\n')}\n\nРазом: ${record.total_amount} грн${promoCode ? `\nПромокод: ${promoCode} (−${promoDiscount} грн)` : ''}\nКоментар: ${record.notes || 'Немає'}`;
       const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text: message }), signal: AbortSignal.timeout(5000)
