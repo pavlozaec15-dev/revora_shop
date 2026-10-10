@@ -319,3 +319,9 @@ header .tools .headerAccount svg{width:18px;height:18px;stroke-width:1.8}
 .revoraCatalogHeading h2{margin:0;font:normal clamp(24px,3vw,36px) Georgia,serif;letter-spacing:-.025em}
 .revoraCatalogBar .filterToggle{flex:0 0 auto}
 @media(max-width:650px){.catalogPage .revoraCatalogBar{padding:10px 0 16px}.revoraCatalogHeading h2{font-size:25px}}
+
+/* Compact premium shopping bag in catalogue navigation */
+header .tools .catalogCartButton{position:relative;display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid #6b5b43;border-radius:50%;background:#1b1916;color:#f1e5d3;transition:background .2s,border-color .2s}
+header .tools .catalogCartButton:hover{background:#302719;border-color:#d4b785}
+header .tools .catalogCartButton svg{width:21px;height:21px}
+header .tools .catalogCartCount{position:absolute;top:-6px;right:-7px;min-width:19px;height:19px;padding:0 4px;display:grid;place-items:center;border-radius:100px;background:#d7b785;color:#15110c;font:bold 10px Arial,sans-serif;box-shadow:0 0 0 2px #090909}
