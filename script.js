@@ -8,6 +8,21 @@ function homeCard(x){
 }
 const grid=document.querySelector("#products");
 const popular=document.querySelector("#popularProducts");
+function fillHeroWithProductPhotos(){
+ const slides=[...document.querySelectorAll('.heroSlide')];
+ const withPhotos=HOME_PRODUCTS.filter(p=>p.images?.[0]);
+ if(!withPhotos.length)return;
+ const choices=[withPhotos.find(p=>p.category==='Пуховики')||withPhotos[0],withPhotos.find(p=>p.badge==='NEW')||withPhotos[1]||withPhotos[0],withPhotos.find(p=>p.badge==='SALE'||Number(p.old)>Number(p.price))||withPhotos[2]||withPhotos[0]];
+ slides.forEach((slide,i)=>{
+  const visual=slide.querySelector('.heroVisual'),product=choices[i];if(!visual||!product)return;
+  if(visual.dataset.customBanner==='true')return;
+  visual.style.backgroundImage='linear-gradient(90deg,rgba(0,0,0,.52),rgba(0,0,0,.2)),url("'+encodeURI(product.images[0]).replace(/["()]/g,'')+'")';
+  visual.style.backgroundSize='cover';visual.style.backgroundPosition='center';
+  const label=visual.querySelector('span');if(label)label.textContent='REVORA · КОЛЕКЦІЯ';
+  const title=visual.querySelector('strong');if(title)title.textContent=product.name;
+  const caption=visual.querySelector('small');if(caption)caption.textContent=Number(product.price).toLocaleString('uk-UA')+' ₴';
+ });
+}
 function renderHomeProducts(){
  if(grid)grid.innerHTML=HOME_PRODUCTS.filter(x=>x.badge==="SALE"||(Number(x.old)>Number(x.price))).slice(0,4).map(homeCard).join("")||'<p>Незабаром тут з’являться знижки REVORA.</p>';
  if(popular)popular.innerHTML=[...HOME_PRODUCTS].sort((a,b)=>Number(b.badge==="TOP")-Number(a.badge==="TOP")).slice(0,4).map(homeCard).join("")||'<p>Товари незабаром з’являться.</p>';
@@ -19,9 +34,9 @@ async function loadHomeProducts(){
   if(!response.ok)throw Error('Catalogue HTTP '+response.status);
   const rows=await response.json();if(!Array.isArray(rows))throw Error('Invalid catalogue');
   HOME_PRODUCTS=rows.map(p=>({id:p.id,name:p.name,category:p.category||'',desc:p.description||'',price:Number(p.price),old:p.old_price==null?null:Number(p.old_price),sizes:p.sizes||[],images:p.image_urls||[],badge:p.badge||''}));
-  renderHomeProducts();
+  renderHomeProducts();fillHeroWithProductPhotos();
  }catch(error){console.warn('Home products Supabase unavailable, trying API',error);
-  try{const response=await fetch('/api/products',{cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok||!Array.isArray(data.products))throw Error('Catalogue unavailable');HOME_PRODUCTS=data.products;renderHomeProducts()}catch(e){console.warn('Home products unavailable',e)}
+  try{const response=await fetch('/api/products',{cache:'no-store'});const data=await response.json();if(!response.ok||!data.ok||!Array.isArray(data.products))throw Error('Catalogue unavailable');HOME_PRODUCTS=data.products;renderHomeProducts();fillHeroWithProductPhotos()}catch(e){console.warn('Home products unavailable',e)}
  }
 }
 loadHomeProducts();
