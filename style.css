@@ -563,3 +563,35 @@ body.zoomOpen{overflow:hidden}.photoZoom[hidden]{display:none!important}.photoZo
  .mobileNav.open a{display:flex;align-items:center;min-height:52px;padding:12px 10px;position:relative;z-index:1;touch-action:manipulation}
  #menu{position:relative;z-index:46;touch-action:manipulation}
 }
+
+/* REVORA mobile layout v2: shared storefront pages */
+@media(max-width:900px){
+ html,body{max-width:100%;overflow-x:clip}
+ header{height:66px;padding-inline:14px;gap:10px;z-index:60;backdrop-filter:none}
+ header .logo{font-size:clamp(17px,4.5vw,23px);letter-spacing:.14em;white-space:nowrap}
+ header .tools{margin-left:auto;align-items:center;gap:7px;min-width:0}
+ header .mobile,#menu{display:inline-flex;align-items:center;justify-content:center;flex:none;width:42px;height:42px;padding:0;border-radius:8px;font-size:22px}
+ .mobileNav.open{top:66px;z-index:59;max-height:calc(100dvh - 66px);padding:10px 16px 20px}
+ .mobileNav.open a{font-size:15px;font-weight:600;letter-spacing:.02em;min-height:54px;border-bottom:1px solid #ffffff1c}
+ .topbar{font-size:9px;text-align:center;padding-inline:8px}
+ .hero{min-height:0;padding:54px 6vw 35px}
+ .heroCopy{max-width:100%}.hero h1{font-size:clamp(37px,10vw,66px);line-height:1.03;overflow-wrap:break-word}
+ .heroVisual{position:relative;inset:auto;transform:none;width:100%;height:230px;margin-top:30px}
+ .heroVisual strong{font-size:clamp(28px,8vw,46px);overflow-wrap:anywhere}
+ .heroControls{bottom:12px;right:6vw}
+ .section{padding:48px 5vw}.sectionHead{margin-bottom:22px;gap:12px}.sectionHead h2{font-size:clamp(29px,8vw,45px)}
+ .products,.catalogGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .product{min-width:0}.productImg{height:auto;aspect-ratio:3/4;overflow:hidden}.productImg img{width:100%;height:100%;object-fit:cover}
+ .info{padding:10px;gap:5px}.info b{font-size:12px;overflow-wrap:anywhere}.price{font-size:12px;overflow-wrap:anywhere}
+ .quickAdd{width:calc(100% - 20px);margin:0 10px 10px;padding:12px 6px}
+ .catalogPage{padding:34px 4vw 65px}.catalogTop h1{font-size:clamp(40px,11vw,64px)}
+ .catalogTools{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:24px 0 14px}.catalogTools input,.catalogTools select{min-width:0;width:100%;font-size:16px}
+ .productPage{display:block;padding:20px 4vw 50px;min-height:0}
+ .gallery,.productDetails{min-width:0;max-width:100%}.mainPhoto{height:auto;aspect-ratio:1/1.15;max-height:75dvh;overflow:hidden}
+ .mainPhoto img{max-width:100%;max-height:100%;object-fit:contain}
+ .productThumbs{overflow-x:auto;max-width:100%;scrollbar-width:thin;overscroll-behavior-x:contain}
+ .productDetails{padding-top:25px}.productDetails h1{font-size:clamp(29px,8vw,44px);overflow-wrap:anywhere;line-height:1.1}
+ .productActions{max-width:100%}.productActions button{min-height:48px}
+ .drawer{max-width:100vw}.photoZoom{padding:65px 10px}
+}
+@media(max-width:390px){header{gap:6px;padding-inline:9px}header .logo{font-size:17px;letter-spacing:.1em}.products,.catalogGrid{gap:7px}.info{padding:8px}.productImg{aspect-ratio:3/4}}
