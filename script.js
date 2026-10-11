@@ -51,7 +51,7 @@ function renderHomeProducts(){
 renderHomeProducts();
 async function loadHomeProducts(){
  try{
-  const response=await fetch('https://mqsytqicykgtbjjvaroa.supabase.co/rest/v1/products?published=eq.true&select=id,name,category,description,price,old_price,sizes,image_urls,badge&order=created_at.desc&limit=300',{headers:{apikey:'sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH'},cache:'no-store'});
+  const response=await fetch('https://mqsytqicykgtbjjvaroa.supabase.co/rest/v1/products?published=eq.true&select=id,name,category,description,price,old_price,sizes,image_urls,badge&order=created_at.desc&limit=300',{headers:{apikey:'sb_publishable_uzjZ93fo6a0DJJaKUqK6ng_S8SCS7mH'},cache:'default'});
   if(!response.ok)throw Error('Catalogue HTTP '+response.status);
   const rows=await response.json();if(!Array.isArray(rows))throw Error('Invalid catalogue');
   HOME_PRODUCTS=rows.map(p=>({id:p.id,name:p.name,category:p.category||'',desc:p.description||'',price:Number(p.price),old:p.old_price==null?null:Number(p.old_price),sizes:p.sizes||[],images:p.image_urls||[],badge:p.badge||''}));
@@ -67,7 +67,7 @@ function autoHero(){clearInterval(timer);if(window.matchMedia("(prefers-reduced-
 document.querySelector("#heroPrev")?.addEventListener("click",()=>{showSlide(current-1);autoHero()});
 document.querySelector("#heroNext")?.addEventListener("click",()=>{showSlide(current+1);autoHero()});
 showSlide(0);autoHero();
-document.querySelector("#menu")?.addEventListener("click",()=>{const n=document.querySelector("#mobileNav");n?.classList.toggle("open");document.querySelector("#menu").setAttribute("aria-expanded",n?.classList.contains("open")?"true":"false")});
+// Mobile menu is handled by the shared catalog.js navigation listener.
 document.querySelectorAll("#mobileNav a").forEach(a=>a.addEventListener("click",()=>document.querySelector("#mobileNav")?.classList.remove("open")));
 const overlay=document.querySelector("#homeSearchOverlay"),search=document.querySelector("#homeSearchInput"),results=document.querySelector("#homeSearchResults");
 function drawSearch(){if(!results)return;const query=search.value.trim().toLocaleLowerCase("uk-UA");const hits=query?HOME_PRODUCTS.filter(p=>(p.name+" "+p.category+" "+p.desc).toLocaleLowerCase("uk-UA").includes(query)).slice(0,7):HOME_PRODUCTS.slice(0,5);results.replaceChildren();if(!hits.length){const p=document.createElement("p");p.textContent="Нічого не знайдено. Спробуйте іншу назву.";results.append(p);return}for(const x of hits){const a=document.createElement("a");a.href="product.html?id="+encodeURIComponent(x.id);const label=document.createElement("span");label.textContent=x.name;const price=document.createElement("b");price.textContent=moneyHome(x.price);a.append(label,price);results.append(a)}}
