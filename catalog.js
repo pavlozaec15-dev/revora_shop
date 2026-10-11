@@ -1,6 +1,7 @@
 let P=window.REVORA_PRODUCTS;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const needsSize=x=>Array.isArray(x.sizes)&&x.sizes.some(v=>String(v??'').trim());
+const isOneSizeAccessory=x=>/шапк|beanie|hat|кепк|панам/i.test(String(x.category||'')+' '+String(x.name||''));
+const needsSize=x=>!isOneSizeAccessory(x)&&Array.isArray(x.sizes)&&x.sizes.some(v=>String(v??'').trim());
 const photoMarkup=(x,kind,priority=false)=>x.images?.[0]?'<img src="'+esc(x.images[0])+'" alt="'+esc(x.name)+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add(\'imageUnavailable\')" style="width:100%;height:100%;object-fit:cover">':kind;
 async function loadPublicProducts(){
   const endpoint='https://mqsytqicykgtbjjvaroa.supabase.co/rest/v1/products?published=eq.true&select=id,name,category,description,price,old_price,sizes,colors,size_guide,image_urls,badge&order=created_at.desc&limit=300';
