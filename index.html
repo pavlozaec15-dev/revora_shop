@@ -27,7 +27,7 @@
 <script>
 // Independent mobile menu: works even if catalog or database scripts fail.
 (()=>{const btn=document.getElementById('menu'),menu=document.getElementById('mobileNav');if(!btn||!menu)return;
-btn.type='button';btn.setAttribute('aria-label','Відкрити меню');btn.setAttribute('aria-expanded','false');
+btn.dataset.menuInline='true';btn.type='button';btn.setAttribute('aria-label','Відкрити меню');btn.setAttribute('aria-expanded','false');
 btn.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();const open=menu.classList.toggle('open');btn.setAttribute('aria-expanded',String(open));btn.setAttribute('aria-label',open?'Закрити меню':'Відкрити меню')});
 menu.addEventListener('click',event=>{if(event.target.closest('a')){menu.classList.remove('open');btn.setAttribute('aria-expanded','false')}});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'){menu.classList.remove('open');btn.setAttribute('aria-expanded','false')}});
