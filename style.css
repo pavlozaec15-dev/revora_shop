@@ -604,3 +604,12 @@ body.zoomOpen{overflow:hidden}.photoZoom[hidden]{display:none!important}.photoZo
 .homeDarkProducts .productLink .info .price{margin-top:auto;padding-top:12px}
 .homeDarkProducts .homeView{flex:none;display:flex;align-items:center;justify-content:center;min-height:48px;margin:0 14px 14px;padding:12px 8px;box-sizing:border-box}
 @media(max-width:900px){.homeDarkProducts .homeView{margin:0 10px 10px;padding:12px 5px;min-height:46px;font-size:clamp(10px,2.7vw,13px);letter-spacing:.03em}}
+
+/* Fix SALE and Popular homepage card actions: same bottom baseline in each row */
+:is(#products,#popularProducts){align-items:stretch}
+:is(#products,#popularProducts)>.product{display:flex;flex-direction:column;min-width:0;height:100%}
+:is(#products,#popularProducts)>.product>.productLink{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+:is(#products,#popularProducts)>.product>.productLink>.info{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+:is(#products,#popularProducts)>.product>.productLink>.info>.price{margin-top:auto;padding-top:12px}
+:is(#products,#popularProducts)>.product>.homeView{display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-sizing:border-box;min-height:48px;margin:0 14px 14px;padding:12px 6px;text-align:center}
+@media(max-width:900px){:is(#products,#popularProducts)>.product>.homeView{min-height:46px;margin:0 9px 10px;padding:10px 3px;font-size:clamp(10px,2.5vw,13px);letter-spacing:.02em}}
